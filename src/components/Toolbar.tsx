@@ -1,5 +1,5 @@
 import React from 'react';
-import { Layers, MapPin, Plus } from 'lucide-react';
+import { Layers, MapPin, Droplet } from 'lucide-react';
 
 interface ToolbarProps {
   showMarkers: boolean;
@@ -57,22 +57,22 @@ export const Toolbar: React.FC<ToolbarProps> = ({
             onClick={() => setAddMode(!addMode)}
             className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
               addMode
-                ? 'bg-accent text-accent-foreground shadow-md ring-2 ring-accent ring-offset-2 ring-offset-card'
+                ? 'bg-cyan-500 text-slate-950 shadow-md ring-2 ring-cyan-400 ring-offset-2 ring-offset-card'
                 : 'bg-transparent text-muted-foreground hover:bg-secondary/50'
             }`}
           >
-            <Plus className="w-4 h-4" />
-            Add Spot
+            <Droplet className="w-4 h-4 text-cyan-400 fill-cyan-400/20" />
+            Pin Water Body
           </button>
         </div>
       </div>
       
       {addMode && (
-        <div className="bg-amber-500 text-slate-950 px-5 py-2 rounded-full text-xs font-extrabold uppercase tracking-wider animate-in fade-in slide-in-from-top-2 shadow-2xl flex items-center gap-3 border border-amber-400">
-          <span>📍 Click anywhere on the map to place a pin</span>
+        <div className="bg-cyan-500 text-slate-950 px-5 py-2 rounded-full text-xs font-extrabold uppercase tracking-wider animate-in fade-in slide-in-from-top-2 shadow-2xl flex items-center gap-3 border border-cyan-300">
+          <span>💧 Click on a body of water on the map to place a pin</span>
           <button
             onClick={() => setAddMode(false)}
-            className="ml-2 px-2 py-0.5 rounded-full bg-slate-950/20 hover:bg-slate-950/40 text-slate-950 text-[10px] font-black transition-colors"
+            className="ml-2 px-2.5 py-0.5 rounded-full bg-slate-950/20 hover:bg-slate-950/40 text-slate-950 text-[10px] font-black transition-colors"
           >
             Cancel
           </button>

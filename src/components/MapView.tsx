@@ -166,12 +166,12 @@ export const MapView: React.FC<MapViewProps> = ({
       });
     }
 
-    // Render temporary pin for pending spot if present
+    // Render temporary pin for pending water spot if present
     if (pendingLatLng) {
       const pendingOuter = L.circleMarker([pendingLatLng.lat, pendingLatLng.lng], {
-        radius: 18,
-        fillColor: '#f59e0b',
-        color: '#f59e0b',
+        radius: 20,
+        fillColor: '#06b6d4',
+        color: '#22d3ee',
         weight: 2,
         fillOpacity: 0.35,
         interactive: false,
@@ -179,7 +179,7 @@ export const MapView: React.FC<MapViewProps> = ({
 
       const pendingInner = L.circleMarker([pendingLatLng.lat, pendingLatLng.lng], {
         radius: 10,
-        fillColor: '#ef4444',
+        fillColor: '#0891b2',
         color: '#ffffff',
         weight: 3,
         opacity: 1,
