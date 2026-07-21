@@ -20,6 +20,7 @@ interface MapViewProps {
   showMarkers: boolean;
   showHeatmap: boolean;
   addMode: boolean;
+  pendingLatLng?: { lat: number; lng: number } | null;
   onMapClick: (lat: number, lng: number) => void;
   onMarkerClick: (spot: FishingSpot) => void;
 }
@@ -30,6 +31,7 @@ export const MapView: React.FC<MapViewProps> = ({
   showMarkers,
   showHeatmap,
   addMode,
+  pendingLatLng,
   onMapClick,
   onMarkerClick,
 }) => {
@@ -66,6 +68,15 @@ export const MapView: React.FC<MapViewProps> = ({
     };
   }, []);
 
+  // Pan map when pendingLatLng changes
+  useEffect(() => {
+    if (mapRef.current && pendingLatLng) {
+      mapRef.current.flyTo([pendingLatLng.lat, pendingLatLng.lng], Math.max(mapRef.current.getZoom(), 8), {
+        duration: 1.2,
+      });
+    }
+  }, [pendingLatLng]);
+
   // Map click handler — rebinds when addMode changes
   useEffect(() => {
     if (!mapRef.current) return;
@@ -94,47 +105,72 @@ export const MapView: React.FC<MapViewProps> = ({
     const layer = markersLayerRef.current;
     layer.clearLayers();
 
-    if (!showMarkers) return;
+    if (showMarkers) {
+      spots.forEach((spot) => {
+        let markerColor = '#0f766e';
+        if (spot.species?.length > 0) {
+          const sd = SPECIES_DATA.find((s) => s.name === spot.species[0]);
+          if (sd) markerColor = sd.color;
+        }
 
-    spots.forEach((spot) => {
-      let markerColor = '#0f766e';
-      if (spot.species?.length > 0) {
-        const sd = SPECIES_DATA.find((s) => s.name === spot.species[0]);
-        if (sd) markerColor = sd.color;
-      }
+        // Outer glow ring
+        const outer = L.circleMarker([spot.lat, spot.lng], {
+          radius: 14,
+          fillColor: markerColor,
+          color: 'transparent',
+          weight: 0,
+          fillOpacity: 0.2,
+          interactive: true,
+        });
 
-      // Outer glow ring
-      const outer = L.circleMarker([spot.lat, spot.lng], {
-        radius: 14,
-        fillColor: markerColor,
-        color: 'transparent',
-        weight: 0,
-        fillOpacity: 0.2,
-        interactive: true,
+        // Main dot
+        const inner = L.circleMarker([spot.lat, spot.lng], {
+          radius: 8,
+          fillColor: markerColor,
+          color: '#ffffff',
+          weight: 2,
+          opacity: 1,
+          fillOpacity: 0.88,
+          interactive: true,
+        });
+
+        const onClick = () => {
+          if (!addMode) onMarkerClick(spot);
+        };
+
+        outer.on('click', onClick);
+        inner.on('click', onClick);
+
+        outer.addTo(layer);
+        inner.addTo(layer);
       });
+    }
 
-      // Main dot
-      const inner = L.circleMarker([spot.lat, spot.lng], {
-        radius: 8,
-        fillColor: markerColor,
-        color: '#ffffff',
+    // Render temporary pin for pending spot if present
+    if (pendingLatLng) {
+      const pendingOuter = L.circleMarker([pendingLatLng.lat, pendingLatLng.lng], {
+        radius: 18,
+        fillColor: '#f59e0b',
+        color: '#f59e0b',
         weight: 2,
-        opacity: 1,
-        fillOpacity: 0.88,
-        interactive: true,
+        fillOpacity: 0.35,
+        interactive: false,
       });
 
-      const onClick = () => {
-        if (!addMode) onMarkerClick(spot);
-      };
+      const pendingInner = L.circleMarker([pendingLatLng.lat, pendingLatLng.lng], {
+        radius: 10,
+        fillColor: '#ef4444',
+        color: '#ffffff',
+        weight: 3,
+        opacity: 1,
+        fillOpacity: 1,
+        interactive: false,
+      });
 
-      outer.on('click', onClick);
-      inner.on('click', onClick);
-
-      outer.addTo(layer);
-      inner.addTo(layer);
-    });
-  }, [spots, showMarkers, addMode, onMarkerClick]);
+      pendingOuter.addTo(layer);
+      pendingInner.addTo(layer);
+    }
+  }, [spots, showMarkers, addMode, pendingLatLng, onMarkerClick]);
 
   // Redraw heatmap whenever data or visibility changes
   useEffect(() => {

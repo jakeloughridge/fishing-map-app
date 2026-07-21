@@ -86,6 +86,9 @@ const PARK_ANCHORS: { lat: number; lng: number }[] = [
   { lat: 44.72, lng: -115.92 }, // North Fork Payette River, ID
   { lat: 45.05, lng: -110.5 }, // Yellowstone River, MT
   { lat: 40.9,  lng: -109.4 }, // Flaming Gorge, UT
+  { lat: 38.98, lng: -105.65 }, // The Dream Stream, CO
+  { lat: 38.47, lng: -107.25 }, // Blue Mesa Reservoir, CO
+  { lat: 39.36, lng: -107.03 }, // Roaring Fork River, CO
   { lat: 35.7,  lng: -83.5 },  // Great Smoky Mountains NP
   { lat: 36.35, lng: -92.6 },  // White River / Bull Shoals, AR
   { lat: 35.8,  lng: -93.0 },  // Ozark NF, AR

@@ -68,8 +68,14 @@ export const Toolbar: React.FC<ToolbarProps> = ({
       </div>
       
       {addMode && (
-        <div className="bg-accent text-accent-foreground px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider animate-in fade-in slide-in-from-top-2 shadow-lg">
-          Click anywhere on the map to add a location
+        <div className="bg-amber-500 text-slate-950 px-5 py-2 rounded-full text-xs font-extrabold uppercase tracking-wider animate-in fade-in slide-in-from-top-2 shadow-2xl flex items-center gap-3 border border-amber-400">
+          <span>📍 Click anywhere on the map to place a pin</span>
+          <button
+            onClick={() => setAddMode(false)}
+            className="ml-2 px-2 py-0.5 rounded-full bg-slate-950/20 hover:bg-slate-950/40 text-slate-950 text-[10px] font-black transition-colors"
+          >
+            Cancel
+          </button>
         </div>
       )}
     </div>

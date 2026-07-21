@@ -121,6 +121,7 @@ function FishingMapApp() {
         showMarkers={showMarkers}
         showHeatmap={showHeatmap}
         addMode={addMode}
+        pendingLatLng={pendingLatLng}
         onMapClick={handleMapClick}
         onMarkerClick={handleMarkerClick}
       />

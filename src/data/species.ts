@@ -343,5 +343,29 @@ export const SPECIES_DATA: FishSpecies[] = [
       { name: "Bomber Dry Fly", setup: "Size 4–6 Brown/Green Bomber foam dry fly, 12ft 10lb fluorocarbon leader", tip: "Dead-drift across glassy river pools; Atlantic Salmon rise slowly from deep holes to sip it" },
       { name: "Inline Casting Spinner / Spoon", setup: "3/8oz Blue Fox Vibrax silver/blue or 1/2oz silver Kastmaster spoon", tip: "Fan cast across mainstem pools where gear fishing is permitted; steady, slow retrieve" }
     ]
+  },
+  {
+    name: "Yellow Perch",
+    color: "#eab308", // Golden Yellow
+    description: "Popular schooling panfish with bright yellow flanks and dark vertical tiger stripes. Highly sought after across the Great Lakes for incredible table fare.",
+    season: "Fall peak (September–November), Spring pre-spawn, Winter ice fishing",
+    habitat: "Sand/gravel flats, weed bed edges, 15–35ft open water lake basins",
+    bestRigs: [
+      { name: "Two-Hook Perch Rig & Live Minnows", setup: "2-hook spreader or high-low rig, 1/2–1oz sinker, emerald shiners or minnow pieces", tip: "Anchor over 25–35ft sand flats; hold rig 6 inches off bottom with subtle twitches" },
+      { name: "Tungsten Jig & Waxworm", setup: "1/16oz gold/orange tungsten jig tipped with waxworm or minnow head", tip: "Vertical jigging directly on the mud line; tap bottom to kick up silt clouds" },
+      { name: "Sonar Blade Bait", setup: "1/4oz silver/gold Sonar or Cicada blade bait, 8lb fluorocarbon", tip: "Short 1ft bottom pops; strikes happen on the vibration pull and fall" }
+    ]
+  },
+  {
+    name: "White Perch",
+    color: "#94a3b8", // Silver Slate / Pewter
+    description: "Prolific semi-anadromous temperate bass with bright silver sides and dark slate backs. School aggressively in brackish estuaries and freshwater lakes.",
+    season: "Late Spring through Autumn (May–October)",
+    habitat: "Brackish rivers, shallow bays, sandy lake bottoms, tidal creek mouths",
+    bestRigs: [
+      { name: "High-Low Bait Rig", setup: "#4 hooks, 1/2oz sinker, live grass shrimp, bloodworms, or nightcrawler pieces", tip: "Cast into tidal creek cuts or lake drop-offs; fast double-header bites when a school passes" },
+      { name: "Small Inline Spinner", setup: "1/8oz Roostertail or Panther Martin in silver/white, 6lb line", tip: "Steady retrieve through schooling fish near bridge pilings and dock shadows" },
+      { name: "Micro Tube Jig", setup: "1/16oz jig head + 1.5\" white/chartreuse tube plastic", tip: "Vertical jigging along channel edges and breaklines" }
+    ]
   }
 ];

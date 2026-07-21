@@ -72,10 +72,13 @@ export const AddSpotForm: React.FC<AddSpotFormProps> = ({ latLng, onSave, onCanc
 
   return (
     <div className="p-6 pt-14 flex flex-col h-full animate-in fade-in duration-300">
-      <div className="mb-5">
-        <h2 className="text-2xl font-bold text-foreground mb-2">Log New Spot</h2>
-        <div className="text-xs text-muted-foreground font-mono bg-secondary/50 py-1.5 px-3 rounded-md inline-block">
-          {latLng.lat.toFixed(4)}, {latLng.lng.toFixed(4)}
+      <div className="mb-5 border-b border-border/50 pb-4">
+        <h2 className="text-2xl font-bold text-foreground mb-2 flex items-center gap-2">
+          <span className="text-amber-400">📍</span> Log New Spot
+        </h2>
+        <div className="flex items-center gap-2 text-xs font-mono bg-amber-500/10 border border-amber-500/30 text-amber-400 py-1.5 px-3 rounded-md">
+          <span className="font-sans font-bold uppercase tracking-wider text-[10px]">Pinned Coordinates:</span>
+          <span>{latLng.lat.toFixed(4)}°, {latLng.lng.toFixed(4)}°</span>
         </div>
       </div>
 
