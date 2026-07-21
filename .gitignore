@@ -1,0 +1,29 @@
+# Dependencies
+node_modules
+.pnpm-store
+
+# Build outputs
+dist
+dist/public
+build
+
+# IDE & OS files
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.vscode/
+.idea/
+
+# Environment
+.env
+.env.local
+.env.*.local
+*.log
+
+# Replit / Temp
+.replit
+replit.nix
+.replit-artifact

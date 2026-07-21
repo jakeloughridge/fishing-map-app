@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Route, Switch, Router as WouterRouter } from 'wouter';
+import { useHashLocation } from 'wouter/use-hash-location';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import { MapView } from '@/components/MapView';
@@ -156,14 +157,10 @@ function FishingMapApp() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}>
+      <WouterRouter hook={useHashLocation}>
         <Switch>
           <Route path="/" component={FishingMapApp} />
-          <Route>
-            <div className="flex h-screen items-center justify-center text-foreground">
-              404 - Not Found
-            </div>
-          </Route>
+          <Route component={FishingMapApp} />
         </Switch>
       </WouterRouter>
     </QueryClientProvider>
