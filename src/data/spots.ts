@@ -505,7 +505,10 @@ export const getSpots = (): FishingSpot[] => {
 
   if (stored) {
     const parsed = JSON.parse(stored) as FishingSpot[];
-    const userSpots = parsed.filter((s) => s.isUserAdded);
+    // Include both user-added spots and any custom pinned spots not in default list
+    const customSpots = parsed.filter(
+      (s) => s.isUserAdded || !DEFAULT_SPOTS.some((def) => def.id === s.id)
+    );
 
     // Merge system default spots with any stored overrides/catches
     const defaultSpots = DEFAULT_SPOTS.map((def) => {
@@ -522,7 +525,7 @@ export const getSpots = (): FishingSpot[] => {
       return def;
     });
 
-    const allSpots = [...defaultSpots, ...userSpots];
+    const allSpots = [...defaultSpots, ...customSpots];
     localStorage.setItem(STORAGE_KEY, JSON.stringify(allSpots));
     return allSpots;
   }

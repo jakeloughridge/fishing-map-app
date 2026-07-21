@@ -65,7 +65,8 @@ function FishingMapApp() {
     saveSpot(newSpot);
     const updated = getSpots();
     setSpots(updated);
-    setSidebarMode(null);
+    setSelectedSpot(newSpot);
+    setSidebarMode('spot');
     setPendingLatLng(null);
   };
 
