@@ -49,11 +49,26 @@ export const MapView: React.FC<MapViewProps> = ({
       zoomControl: false,
     }).setView([39.5, -96.0], 4);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    // Primary: CartoDB Dark Matter (native dark mode vector tiles)
+    const darkTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      maxZoom: 20,
+      subdomains: 'abcd',
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    });
+
+    // Fallback: Standard OpenStreetMap
+    const fallbackTiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
-      attribution: '© OpenStreetMap contributors',
-      className: 'map-tiles',
-    }).addTo(map);
+      attribution: '&copy; OpenStreetMap contributors',
+    });
+
+    darkTiles.on('tileerror', () => {
+      if (!map.hasLayer(fallbackTiles)) {
+        fallbackTiles.addTo(map);
+      }
+    });
+
+    darkTiles.addTo(map);
 
     L.control.zoom({ position: 'bottomleft' }).addTo(map);
 
@@ -68,12 +83,32 @@ export const MapView: React.FC<MapViewProps> = ({
     };
   }, []);
 
+  // Force Leaflet to recalculate viewport size whenever addMode or pendingLatLng changes
+  useEffect(() => {
+    if (!mapRef.current) return;
+    const timer = setTimeout(() => {
+      mapRef.current?.invalidateSize();
+    }, 150);
+    return () => clearTimeout(timer);
+  }, [addMode, pendingLatLng]);
+
+  // ResizeObserver on map container to continuously invalidate size on panel toggle
+  useEffect(() => {
+    if (!mapContainerRef.current || !mapRef.current) return;
+    const observer = new ResizeObserver(() => {
+      mapRef.current?.invalidateSize();
+    });
+    observer.observe(mapContainerRef.current);
+    return () => observer.disconnect();
+  }, []);
+
   // Pan map when pendingLatLng changes
   useEffect(() => {
     if (mapRef.current && pendingLatLng) {
       mapRef.current.flyTo([pendingLatLng.lat, pendingLatLng.lng], Math.max(mapRef.current.getZoom(), 8), {
         duration: 1.2,
       });
+      mapRef.current.invalidateSize();
     }
   }, [pendingLatLng]);
 
@@ -200,7 +235,7 @@ export const MapView: React.FC<MapViewProps> = ({
   return (
     <div
       ref={mapContainerRef}
-      className={`w-[100vw] h-[100vh] z-0 ${
+      className={`absolute inset-0 w-full h-full z-0 ${
         addMode ? 'cursor-crosshair' : 'cursor-grab active:cursor-grabbing'
       }`}
     />
