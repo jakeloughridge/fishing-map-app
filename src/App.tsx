@@ -97,6 +97,11 @@ function FishingMapApp() {
 
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-background text-foreground font-sans">
+      <style>{`
+        .map-tiles {
+          filter: brightness(0.6) contrast(1.2) sepia(0.2) hue-rotate(180deg) saturate(0.8) invert(1);
+        }
+      `}</style>
 
       <Toolbar
         showMarkers={showMarkers}

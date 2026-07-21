@@ -52,6 +52,7 @@ export const MapView: React.FC<MapViewProps> = ({
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '© OpenStreetMap contributors',
+      className: 'map-tiles',
     }).addTo(map);
 
     L.control.zoom({ position: 'bottomleft' }).addTo(map);
