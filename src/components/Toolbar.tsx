@@ -6,8 +6,7 @@ interface ToolbarProps {
   setShowMarkers: (v: boolean) => void;
   showHeatmap: boolean;
   setShowHeatmap: (v: boolean) => void;
-  addMode: boolean;
-  setAddMode: (v: boolean) => void;
+  onPinAtCenter?: () => void;
 }
 
 export const Toolbar: React.FC<ToolbarProps> = ({
@@ -15,8 +14,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   setShowMarkers,
   showHeatmap,
   setShowHeatmap,
-  addMode,
-  setAddMode,
+  onPinAtCenter,
 }) => {
   return (
     <div className="absolute top-6 left-1/2 -translate-x-1/2 z-[1000] flex flex-col items-center gap-2">
@@ -53,31 +51,22 @@ export const Toolbar: React.FC<ToolbarProps> = ({
             Heatmap
           </button>
 
-          <button
-            onClick={() => setAddMode(!addMode)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
-              addMode
-                ? 'bg-cyan-500 text-slate-950 shadow-md ring-2 ring-cyan-400 ring-offset-2 ring-offset-card'
-                : 'bg-transparent text-muted-foreground hover:bg-secondary/50'
-            }`}
-          >
-            <Droplet className="w-4 h-4 text-cyan-400 fill-cyan-400/20" />
-            Pin Water Body
-          </button>
+          {onPinAtCenter && (
+            <button
+              onClick={onPinAtCenter}
+              className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold bg-cyan-500 hover:bg-cyan-400 text-slate-950 shadow-md transition-all duration-200"
+              title="Place Water Pin at current map center"
+            >
+              <Droplet className="w-4 h-4 fill-slate-950" />
+              Pin Map Center
+            </button>
+          )}
         </div>
       </div>
-      
-      {addMode && (
-        <div className="bg-cyan-500 text-slate-950 px-5 py-2 rounded-full text-xs font-extrabold uppercase tracking-wider animate-in fade-in slide-in-from-top-2 shadow-2xl flex items-center gap-3 border border-cyan-300">
-          <span>💧 Click on a body of water on the map to place a pin</span>
-          <button
-            onClick={() => setAddMode(false)}
-            className="ml-2 px-2.5 py-0.5 rounded-full bg-slate-950/20 hover:bg-slate-950/40 text-slate-950 text-[10px] font-black transition-colors"
-          >
-            Cancel
-          </button>
-        </div>
-      )}
+
+      <div className="bg-slate-950/80 backdrop-blur-md text-cyan-300 px-4 py-1.5 rounded-full text-[11px] font-extrabold uppercase tracking-wider shadow-xl flex items-center gap-2 border border-cyan-500/30">
+        <span>💧 Drag the cyan pin anywhere on the map to log a body of water</span>
+      </div>
     </div>
   );
 };

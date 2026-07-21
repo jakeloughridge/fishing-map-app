@@ -22,6 +22,7 @@ interface MapViewProps {
   addMode: boolean;
   pendingLatLng?: { lat: number; lng: number } | null;
   onMapClick: (lat: number, lng: number) => void;
+  onPinDrop: (lat: number, lng: number) => void;
   onMarkerClick: (spot: FishingSpot) => void;
 }
 
@@ -33,6 +34,7 @@ export const MapView: React.FC<MapViewProps> = ({
   addMode,
   pendingLatLng,
   onMapClick,
+  onPinDrop,
   onMarkerClick,
 }) => {
   const mapRef = useRef<L.Map | null>(null);
@@ -40,6 +42,7 @@ export const MapView: React.FC<MapViewProps> = ({
 
   const markersLayerRef = useRef<L.LayerGroup | null>(null);
   const heatmapLayerRef = useRef<L.LayerGroup | null>(null);
+  const draggableMarkerRef = useRef<L.Marker | null>(null);
 
   // Initialize Map once
   useEffect(() => {
@@ -67,6 +70,47 @@ export const MapView: React.FC<MapViewProps> = ({
       mapRef.current = null;
     };
   }, []);
+
+  // Manage Draggable Water Pin
+  useEffect(() => {
+    if (!mapRef.current) return;
+    const map = mapRef.current;
+
+    const waterPinIcon = L.divIcon({
+      className: 'custom-water-pin-icon',
+      html: `
+        <div style="position: relative; display: flex; align-items: center; justify-content: center; cursor: grab;">
+          <div style="position: absolute; width: 44px; height: 44px; background: rgba(6, 182, 212, 0.35); border-radius: 50%; border: 1.5px dashed #22d3ee; animation: pulse 2s infinite;"></div>
+          <div style="width: 32px; height: 32px; border-radius: 50%; background: #0891b2; border: 2.5px solid #ffffff; box-shadow: 0 10px 25px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; font-size: 15px;">
+            💧
+          </div>
+        </div>
+      `,
+      iconSize: [44, 44],
+      iconAnchor: [22, 22],
+    });
+
+    const initialPos = pendingLatLng ? [pendingLatLng.lat, pendingLatLng.lng] : [39.5, -96.0];
+
+    if (!draggableMarkerRef.current) {
+      const marker = L.marker(initialPos as [number, number], {
+        draggable: true,
+        icon: waterPinIcon,
+        zIndexOffset: 2000,
+      }).addTo(map);
+
+      marker.on('dragend', (e) => {
+        const ll = e.target.getLatLng();
+        onPinDrop(ll.lat, ll.lng);
+      });
+
+      draggableMarkerRef.current = marker;
+    } else {
+      if (pendingLatLng) {
+        draggableMarkerRef.current.setLatLng([pendingLatLng.lat, pendingLatLng.lng]);
+      }
+    }
+  }, [pendingLatLng, onPinDrop]);
 
   // Force Leaflet to recalculate viewport size whenever addMode or pendingLatLng changes
   useEffect(() => {

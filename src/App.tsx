@@ -43,10 +43,15 @@ function FishingMapApp() {
     [spots]
   );
 
+  const handlePinDrop = (lat: number, lng: number) => {
+    setPendingLatLng({ lat, lng });
+    setSelectedSpot(null);
+    setSidebarMode('addForm');
+  };
+
   const handleMapClick = (lat: number, lng: number) => {
     if (addMode) {
-      setPendingLatLng({ lat, lng });
-      setSidebarMode('addForm');
+      handlePinDrop(lat, lng);
       setAddMode(false);
     }
   };
@@ -108,11 +113,7 @@ function FishingMapApp() {
         setShowMarkers={setShowMarkers}
         showHeatmap={showHeatmap}
         setShowHeatmap={setShowHeatmap}
-        addMode={addMode}
-        setAddMode={(val) => {
-          setAddMode(val);
-          if (val) closeSidebar();
-        }}
+        onPinAtCenter={() => handlePinDrop(39.5, -96.0)}
       />
 
       <MapView
@@ -123,6 +124,7 @@ function FishingMapApp() {
         addMode={addMode}
         pendingLatLng={pendingLatLng}
         onMapClick={handleMapClick}
+        onPinDrop={handlePinDrop}
         onMarkerClick={handleMarkerClick}
       />
 
