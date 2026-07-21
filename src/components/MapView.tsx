@@ -49,26 +49,11 @@ export const MapView: React.FC<MapViewProps> = ({
       zoomControl: false,
     }).setView([39.5, -96.0], 4);
 
-    // Primary: CartoDB Dark Matter (native dark mode vector tiles)
-    const darkTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      maxZoom: 20,
-      subdomains: 'abcd',
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-    });
-
-    // Fallback: Standard OpenStreetMap
-    const fallbackTiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
-      attribution: '&copy; OpenStreetMap contributors',
-    });
-
-    darkTiles.on('tileerror', () => {
-      if (!map.hasLayer(fallbackTiles)) {
-        fallbackTiles.addTo(map);
-      }
-    });
-
-    darkTiles.addTo(map);
+      attribution: '© OpenStreetMap contributors',
+      className: 'map-tiles',
+    }).addTo(map);
 
     L.control.zoom({ position: 'bottomleft' }).addTo(map);
 
