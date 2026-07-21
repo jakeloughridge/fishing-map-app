@@ -1,5 +1,5 @@
-import React from 'react';
-import { X } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -8,35 +8,45 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, children }) => {
-  return (
-    <>
-      {/* Mobile backdrop */}
-      {isOpen && (
-        <div
-          onClick={onClose}
-          className="fixed inset-0 bg-background/40 backdrop-blur-xs z-[1000] sm:hidden animate-in fade-in duration-200"
-        />
-      )}
+  const [isMinimized, setIsMinimized] = useState(false);
 
-      <div
-        className={`fixed top-0 left-0 h-full w-full sm:w-[380px] max-w-full bg-card/95 backdrop-blur-md shadow-2xl border-r border-border z-[1001] transform transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] flex flex-col ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
-      >
-        <div className="h-full flex flex-col overflow-hidden relative">
+  if (!isOpen) return null;
+
+  return (
+    <div
+      className={`fixed top-20 left-4 z-[1001] transition-all duration-300 ease-out flex flex-col ${
+        isMinimized
+          ? 'w-12 h-12 rounded-full overflow-hidden'
+          : 'w-[360px] max-w-[calc(100vw-2rem)] h-[calc(100vh-6rem)] rounded-2xl'
+      } bg-card/95 backdrop-blur-md shadow-2xl border border-border`}
+    >
+      <div className="h-full flex flex-col overflow-hidden relative">
+        {/* Top Control Bar */}
+        <div className="absolute top-3 right-3 flex items-center gap-1 z-20">
           <button
-            onClick={onClose}
-            className="absolute top-4 right-4 p-2 rounded-full bg-secondary text-secondary-foreground hover:bg-primary hover:text-primary-foreground transition-colors z-10"
-            title="Close panel"
+            onClick={() => setIsMinimized(!isMinimized)}
+            className="p-1.5 rounded-full bg-secondary text-secondary-foreground hover:bg-primary hover:text-primary-foreground transition-colors"
+            title={isMinimized ? 'Expand panel' : 'Minimize panel'}
           >
-            <X className="w-5 h-5" />
+            {isMinimized ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
           </button>
-          
+          {!isMinimized && (
+            <button
+              onClick={onClose}
+              className="p-1.5 rounded-full bg-secondary text-secondary-foreground hover:bg-destructive hover:text-destructive-foreground transition-colors"
+              title="Close panel"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+
+        {!isMinimized && (
           <div className="flex-1 overflow-y-auto overflow-x-hidden">
             {children}
           </div>
-        </div>
+        )}
       </div>
-    </>
+    </div>
   );
 };
