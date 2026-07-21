@@ -10,10 +10,11 @@ export type FishingSpot = {
   dateAdded: string;
   isUserAdded: boolean;
   accessDifficulty: AccessDifficulty;
+  pressureOverride?: number;
 };
 
 // Changing this key forces all browsers to start fresh (old key is simply abandoned)
-const STORAGE_KEY = 'fishing_spots_v8';
+const STORAGE_KEY = 'fishing_spots_v25';
 
 // 20 spots spread across the continental US
 const DEFAULT_SPOTS: FishingSpot[] = [
@@ -23,8 +24,8 @@ const DEFAULT_SPOTS: FishingSpot[] = [
     name: 'Deschutes River Canyon, OR',
     lat: 44.88,
     lng: -120.82,
-    species: ['Rainbow Trout'],
-    notes: 'Wild redband trout pocket water. Wade carefully — slick basalt bottom. Best from June–Sept.',
+    species: ['Rainbow Trout', 'King Salmon', 'Coho Salmon'],
+    notes: 'Wild redband trout pocket water and annual salmon runs. Wade carefully — slick basalt bottom. Best from June–Sept.',
     dateAdded: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(),
     isUserAdded: false,
     accessDifficulty: 'hike',
@@ -34,8 +35,8 @@ const DEFAULT_SPOTS: FishingSpot[] = [
     name: 'Puget Sound Pier 86, WA',
     lat: 47.63,
     lng: -122.37,
-    species: ['Rainbow Trout'],
-    notes: 'Sea-run cutthroat in the Sound year-round. Anchovies or small spinners under a float. Coho salmon pass through August–October.',
+    species: ['Rainbow Trout', 'Coho Salmon', 'King Salmon', 'Pink Salmon', 'Chum Salmon'],
+    notes: 'Sea-run cutthroat and rainbow trout in the Sound year-round. Coho, King, Pink, and Chum salmon pass through from August through November. Buzz Bombs, spinners, and live bait under floats.',
     dateAdded: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(),
     isUserAdded: false,
     accessDifficulty: 'easy',
@@ -66,14 +67,14 @@ const DEFAULT_SPOTS: FishingSpot[] = [
   },
   {
     id: 'spot-id-3',
-    name: 'Deadwood Reservoir, Boise NF, ID',
-    lat: 44.28,
-    lng: -115.68,
-    species: ['Brook Trout', 'Rainbow Trout'],
-    notes: 'Remote Boise NF reservoir surrounded by Ponderosa pine. Native brookies and stockie rainbows. Road washes out early spring — plan for a hike.',
+    name: 'Middle Fork Payette River — Rattlesnake Campground, ID',
+    lat: 44.18,
+    lng: -115.93,
+    species: ['Rainbow Trout', 'Brown Trout', 'Brook Trout'],
+    notes: 'Scenic freestone mountain river running right past Rattlesnake Campground in the Boise National Forest. Wild rainbow, brown, and brook trout hold in shallow riffles, pocket water, and deep boulder pools. Excellent wading and dry-fly fishing from June through October.',
     dateAdded: new Date(Date.now() - 48 * 24 * 60 * 60 * 1000).toISOString(),
     isUserAdded: false,
-    accessDifficulty: 'hike',
+    accessDifficulty: 'easy',
   },
   {
     id: 'spot-id-4',
@@ -117,8 +118,8 @@ const DEFAULT_SPOTS: FishingSpot[] = [
     name: 'Yellowstone River Oxbow, MT',
     lat: 45.05,
     lng: -110.48,
-    species: ['Rainbow Trout'],
-    notes: 'Cutthroat and rainbow mix. No bait allowed — artificial only. Pristine water.',
+    species: ['Cutthroat Trout', 'Rainbow Trout', 'Brown Trout'],
+    notes: 'Cutthroat and rainbow mix with big browns lurking in deep pools. No bait allowed — artificial lures and flies only. Pristine water.',
     dateAdded: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
     isUserAdded: false,
     accessDifficulty: 'hike',
@@ -163,8 +164,8 @@ const DEFAULT_SPOTS: FishingSpot[] = [
     name: 'Sam Rayburn Reservoir Timber Flats, TX',
     lat: 31.07,
     lng: -94.12,
-    species: ['Largemouth Bass', 'Catfish'],
-    notes: 'Massive largemouth bass lake. Flipping jigs into the standing timber is deadly.',
+    species: ['Largemouth Bass', 'Catfish', 'Crappie', 'Bluegill'],
+    notes: 'Massive largemouth bass lake with standing timber, slab crappie on brush piles, and bluegill in shallow coves. Flipping jigs into standing timber is deadly.',
     dateAdded: new Date(Date.now() - 18 * 24 * 60 * 60 * 1000).toISOString(),
     isUserAdded: false,
     accessDifficulty: 'easy',
@@ -176,8 +177,8 @@ const DEFAULT_SPOTS: FishingSpot[] = [
     name: 'Boundary Waters Portage Lake, MN',
     lat: 47.92,
     lng: -91.48,
-    species: ['Walleye', 'Rainbow Trout'],
-    notes: 'Permit required. Remote canoe country — no motors. Worth every portage.',
+    species: ['Walleye', 'Rainbow Trout', 'Northern Pike'],
+    notes: 'Permit required. Remote canoe country with trophy Northern Pike lurking in cabbage bays and Walleye off rocky reefs. Worth every portage.',
     dateAdded: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString(),
     isUserAdded: false,
     accessDifficulty: 'hike',
@@ -187,8 +188,8 @@ const DEFAULT_SPOTS: FishingSpot[] = [
     name: 'Green Bay Walleye Reef, WI',
     lat: 44.48,
     lng: -87.92,
-    species: ['Walleye', 'Striped Bass'],
-    notes: 'Rocky reef at 18–24ft. Night jigging with glow jigs produces limits.',
+    species: ['Walleye', 'Northern Pike', 'Muskellunge'],
+    notes: 'Rocky reef at 18–24ft. Trophy Muskellunge and Northern Pike in Green Bay weed flats, plus night walleye jigging.',
     dateAdded: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
     isUserAdded: false,
     accessDifficulty: 'easy',
@@ -233,8 +234,8 @@ const DEFAULT_SPOTS: FishingSpot[] = [
     name: 'Lake Okeechobee Rim Canal, FL',
     lat: 26.92,
     lng: -80.81,
-    species: ['Largemouth Bass', 'Catfish'],
-    notes: 'Giant bass in the lily pads. February–April peak. Swim jigs and frogs rule.',
+    species: ['Largemouth Bass', 'Catfish', 'Crappie', 'Bluegill'],
+    notes: 'Giant bass in the lily pads, plus black crappie (speckled perch) in the rim canal and big bluegill in grass beds. February–April peak. Swim jigs and live minnows rule.',
     dateAdded: new Date(Date.now() - 40 * 24 * 60 * 60 * 1000).toISOString(),
     isUserAdded: false,
     accessDifficulty: 'easy',
@@ -290,30 +291,32 @@ const DEFAULT_SPOTS: FishingSpot[] = [
     name: 'Bethany Beach Surf, DE',
     lat: 38.54,
     lng: -75.06,
-    species: ['Striped Bass', 'Spanish Mackerel'],
-    notes: 'Mid-Atlantic surf spot. Stripers blitz Oct–Nov on bunker. Spanish Mackerel show up June–Sept — fast Gotcha plugs in the wash. Dawn and dusk are money. Bucktails and metal-lipped swimmers for stripers.',
+    species: ['Striped Bass', 'Spanish Mackerel', 'Bluefish', 'Black Drum'],
+    notes: 'Mid-Atlantic surf spot. Stripers blitz Oct–Nov on bunker. Spanish Mackerel and Bluefish show up June–Sept. Spring brings heavy Black Drum to the surf sloughs on fresh sea clam bait.',
     dateAdded: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
     isUserAdded: false,
     accessDifficulty: 'easy',
+    pressureOverride: 0.55,
   },
   {
     id: 'spot-de-2',
     name: 'Indian River Inlet, DE',
     lat: 38.61,
     lng: -75.07,
-    species: ['Striped Bass', 'Spanish Mackerel'],
-    notes: 'One of the most productive inlets on the Delmarva Peninsula. Strong tidal rip holds stripers year-round. Spanish Mac flood the inlet June–Sept. Fish the outgoing tide from the jetty rocks — metal lures and bucktails in the current seam.',
+    species: ['Striped Bass', 'Spanish Mackerel', 'Bluefish', 'Black Drum'],
+    notes: 'One of the most productive inlets on the Delmarva Peninsula. Strong tidal rip holds stripers, aggressive bluefish, and bottom-feeding Black Drum year-round. Fish outgoing tides from jetty rocks with wire leaders and clam/crab bait.',
     dateAdded: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
     isUserAdded: false,
     accessDifficulty: 'easy',
+    pressureOverride: 0.85,
   },
   {
     id: 'spot-va-1',
     name: 'Chesapeake Bay Mouth, VA',
     lat: 37.0,
     lng: -76.02,
-    species: ['Striped Bass'],
-    notes: 'Fall striper blitz is legendary. Live bunker under birds is the move.',
+    species: ['Striped Bass', 'Cobia', 'Summer Flounder', 'Speckled Trout', 'Red Drum', 'Black Drum'],
+    notes: 'Fall striper blitz is legendary. Summer cobia cruising the CBBT pilings, trophy Red Drum & Black Drum feeding along the shoals and deep channels, summer flounder along 18–35ft drop-offs, and speckled trout in Lynnhaven and Rudee inlets.',
     dateAdded: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
     isUserAdded: false,
     accessDifficulty: 'easy',
@@ -334,11 +337,131 @@ const DEFAULT_SPOTS: FishingSpot[] = [
     name: 'Rangeley Lake, ME',
     lat: 44.91,
     lng: -70.68,
-    species: ['Rainbow Trout', 'Walleye'],
-    notes: 'Landlocked salmon and brook trout in crystal clear water. Trolling streamers works all summer.',
+    species: ['Brook Trout', 'Atlantic Salmon'],
+    notes: 'Famous landlocked Atlantic Salmon and native brook trout in crystal clear waters. Trolling streamers and drifting dry flies is legendary.',
     dateAdded: new Date(Date.now() - 55 * 24 * 60 * 60 * 1000).toISOString(),
     isUserAdded: false,
     accessDifficulty: 'moderate',
+  },
+
+  // ── Nevada & Wyoming ──────────────────────────────────────────────────────
+  {
+    id: 'spot-nv-1',
+    name: 'Pyramid Lake — Pelican Point, NV',
+    lat: 39.95,
+    lng: -119.60,
+    species: ['Cutthroat Trout', 'Rainbow Trout'],
+    notes: 'World-famous terminal desert lake home to massive Lahontan Cutthroat Trout (trophies over 20 lbs). Anglers wade from stepladders in hip-deep water casting balanced leeches under indicators. Rainbow trout hold near river mouths in spring.',
+    dateAdded: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+    isUserAdded: false,
+    accessDifficulty: 'easy',
+  },
+  {
+    id: 'spot-wy-1',
+    name: 'Yellowstone Lake — West Thumb, WY',
+    lat: 44.42,
+    lng: -110.57,
+    species: ['Cutthroat Trout', 'Rainbow Trout', 'Brown Trout', 'Brook Trout'],
+    notes: 'High-altitude lake in the heart of Yellowstone NP holding native Yellowstone Cutthroat Trout alongside rainbow, brown, and brook trout in connected bays and tributaries. Sight-fishing along thermal drop-offs and stream mouths at first light. Artificial lures/flies only with barbless hooks.',
+    dateAdded: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+    isUserAdded: false,
+    accessDifficulty: 'moderate',
+  },
+
+  // ── North Carolina Sounds ──────────────────────────────────────────────────
+  {
+    id: 'spot-nc-1',
+    name: 'Albemarle Sound — Roanoke Marshes, NC',
+    lat: 35.88,
+    lng: -75.65,
+    species: ['Speckled Trout', 'Red Drum', 'Striped Bass', 'Summer Flounder', 'Black Drum'],
+    notes: 'Sprawling brackish estuary system behind the northern Outer Banks. Speckled trout stack up in grassy cuts, Black Drum feed along oyster beds, and stripers hold near bridge pilings.',
+    dateAdded: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+    isUserAdded: false,
+    accessDifficulty: 'easy',
+  },
+  {
+    id: 'spot-nc-2',
+    name: 'Pamlico Sound — Ocracoke Shoals, NC',
+    lat: 35.15,
+    lng: -75.98,
+    species: ['Speckled Trout', 'Red Drum', 'Summer Flounder', 'Bluefish', 'Spanish Mackerel', 'Black Drum'],
+    notes: 'The largest lagoonal estuary on the US East Coast. World-famous for giant Red Drum ("Old Drum") and heavyweight Black Drum on shoal edges, plus trophy Speckled Trout over submerged grass beds.',
+    dateAdded: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+    isUserAdded: false,
+    accessDifficulty: 'moderate',
+  },
+
+  // ── Texas & Great Lakes ───────────────────────────────────────────────────
+  {
+    id: 'spot-tx-3',
+    name: 'Lake Fork — Birch Creek Timber, TX',
+    lat: 32.85,
+    lng: -95.53,
+    species: ['Largemouth Bass', 'Crappie', 'Bluegill', 'Catfish'],
+    notes: 'Premier trophy largemouth bass capital responsible for over half of the top 50 Texas state-record bass. Massive standing timber fields and hydrilla beds, plus outstanding spring slab crappie in the timber and bluegill in shallow coves.',
+    dateAdded: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    isUserAdded: false,
+    accessDifficulty: 'easy',
+  },
+  {
+    id: 'spot-ny-2',
+    name: 'Lake Ontario — Henderson Harbor, NY',
+    lat: 43.85,
+    lng: -76.20,
+    species: ['Rainbow Trout', 'Brown Trout', 'Atlantic Salmon', 'Walleye', 'Smallmouth Bass', 'Northern Pike', 'Muskellunge', 'Bluegill', 'Crappie'],
+    notes: 'Iconic Great Lakes fishery offering world-class trophy King Salmon, Steelhead, Brown Trout, and Atlantic Salmon trolling. Monster Smallmouth Bass, Walleye, Northern Pike, and Muskellunge on rocky shoals and weed bays.',
+    dateAdded: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    isUserAdded: false,
+    accessDifficulty: 'easy',
+  },
+
+  // ── Alabama ───────────────────────────────────────────────────────────────
+  {
+    id: 'spot-al-1',
+    name: 'Lake Guntersville — Waterfront Park, AL',
+    lat: 34.36,
+    lng: -86.29,
+    species: ['Largemouth Bass', 'Crappie', 'Bluegill', 'Catfish'],
+    notes: 'Alabama\'s largest lake and a premier legendary TVA bass fishery. Famous for vast hydrilla and eelgrass beds, ledge fishing along the Tennessee River channel, trophy slab crappie along causeways, and heavy bluegill in shallow grass.',
+    dateAdded: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    isUserAdded: false,
+    accessDifficulty: 'easy',
+  },
+
+  // ── California, Alaska & Michigan ─────────────────────────────────────────
+  {
+    id: 'spot-ca-3',
+    name: 'Clear Lake — Lucerne Harbor, CA',
+    lat: 39.09,
+    lng: -122.78,
+    species: ['Largemouth Bass', 'Catfish', 'Crappie', 'Bluegill'],
+    notes: 'Natural freshwater lake in Northern California widely considered the #1 largemouth bass fishery in the West. Famous for double-digit trophy Florida-strain bass feeding on hitch shad, heavy tule reed beds, dock flipping, and spring slab crappie.',
+    dateAdded: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    isUserAdded: false,
+    accessDifficulty: 'easy',
+  },
+  {
+    id: 'spot-ak-1',
+    name: 'Kenai River — Soldotna Bridge Park, AK',
+    lat: 60.48,
+    lng: -151.07,
+    species: ['King Salmon', 'Sockeye Salmon', 'Coho Salmon', 'Pink Salmon', 'Chum Salmon', 'Rainbow Trout', 'Cutthroat Trout'],
+    notes: 'World-famous turquoise glacial river on Alaska\'s Kenai Peninsula. Legendary runs of King Salmon, Sockeye, Coho, Pink, and Chum salmon, plus monster trophy Rainbow Trout (30"+) feeding on salmon eggs and flesh.',
+    dateAdded: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    isUserAdded: false,
+    accessDifficulty: 'easy',
+  },
+  {
+    id: 'spot-mi-1',
+    name: 'Lake St. Clair — Anchor Bay, MI',
+    lat: 42.66,
+    lng: -82.72,
+    species: ['Smallmouth Bass', 'Walleye', 'Muskellunge', 'Northern Pike', 'Crappie', 'Bluegill'],
+    notes: 'Premier freshwater fishery connecting Lake Huron and Lake Erie. World-renowned shallow-water Smallmouth Bass & Muskellunge factory with vast cabbage grass beds and sand flats, plus trophy Walleye trolling and Northern Pike in Anchor Bay.',
+    dateAdded: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    isUserAdded: false,
+    accessDifficulty: 'easy',
   },
 ];
 
@@ -347,10 +470,26 @@ export const getSpots = (): FishingSpot[] => {
 
   if (stored) {
     const parsed = JSON.parse(stored) as FishingSpot[];
-    return parsed.map((s) => ({
-      ...s,
-      accessDifficulty: (s.accessDifficulty ?? 'easy') as AccessDifficulty,
-    }));
+    const userSpots = parsed.filter((s) => s.isUserAdded);
+
+    // Merge system default spots with any stored overrides/catches
+    const defaultSpots = DEFAULT_SPOTS.map((def) => {
+      const storedMatch = parsed.find((s) => s.id === def.id);
+      if (storedMatch) {
+        return {
+          ...def,
+          species: def.species,
+          notes: def.notes || storedMatch.notes,
+          accessDifficulty: (storedMatch.accessDifficulty ?? def.accessDifficulty) as AccessDifficulty,
+          pressureOverride: def.pressureOverride ?? storedMatch.pressureOverride,
+        };
+      }
+      return def;
+    });
+
+    const allSpots = [...defaultSpots, ...userSpots];
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(allSpots));
+    return allSpots;
   }
 
   // First load on this key — seed with defaults

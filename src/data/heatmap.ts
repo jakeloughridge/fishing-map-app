@@ -82,7 +82,7 @@ const PARK_ANCHORS: { lat: number; lng: number }[] = [
   { lat: 47.9,  lng: -114.1 }, // Flathead Lake, MT
   { lat: 43.61, lng: -116.20 }, // Boise River Greenbelt, ID
   { lat: 43.52, lng: -115.61 }, // South Fork Boise River, ID
-  { lat: 44.28, lng: -115.68 }, // Deadwood Reservoir, Boise NF, ID
+  { lat: 44.18, lng: -115.93 }, // Middle Fork Payette River, ID
   { lat: 44.72, lng: -115.92 }, // North Fork Payette River, ID
   { lat: 45.05, lng: -110.5 }, // Yellowstone River, MT
   { lat: 40.9,  lng: -109.4 }, // Flaming Gorge, UT
@@ -103,6 +103,40 @@ const PARK_ANCHORS: { lat: number; lng: number }[] = [
   { lat: 37.0,  lng: -76.0 },  // Chesapeake Bay, VA
   { lat: 29.1,  lng: -103.2 }, // Big Bend NP, TX
   { lat: 31.1,  lng: -94.1 },  // Sam Rayburn Reservoir, TX
+];
+
+// ─── Major City Anchors ───────────────────────────────────────────────────────
+// Major US metropolitan areas. Cities have high fishing pressure (0.88+) on heatmap.
+
+const MAJOR_CITY_ANCHORS: { lat: number; lng: number }[] = [
+  { lat: 40.71, lng: -74.01 }, // New York City, NY
+  { lat: 34.05, lng: -118.24 }, // Los Angeles, CA
+  { lat: 41.88, lng: -87.63 },  // Chicago, IL
+  { lat: 29.76, lng: -95.37 },  // Houston, TX
+  { lat: 33.45, lng: -112.07 }, // Phoenix, AZ
+  { lat: 39.95, lng: -75.17 },  // Philadelphia, PA
+  { lat: 29.42, lng: -98.49 },  // San Antonio, TX
+  { lat: 32.72, lng: -117.16 }, // San Diego, CA
+  { lat: 32.78, lng: -96.80 },  // Dallas, TX
+  { lat: 37.77, lng: -122.42 }, // San Francisco, CA
+  { lat: 30.27, lng: -97.74 },  // Austin, TX
+  { lat: 47.61, lng: -122.33 }, // Seattle, WA
+  { lat: 39.74, lng: -104.99 }, // Denver, CO
+  { lat: 38.90, lng: -77.04 },  // Washington, DC
+  { lat: 39.29, lng: -76.61 },  // Baltimore, MD
+  { lat: 42.36, lng: -71.06 },  // Boston, MA
+  { lat: 33.75, lng: -84.39 },  // Atlanta, GA
+  { lat: 25.76, lng: -80.19 },  // Miami, FL
+  { lat: 27.95, lng: -82.46 },  // Tampa, FL
+  { lat: 42.33, lng: -83.05 },  // Detroit, MI
+  { lat: 44.98, lng: -93.27 },  // Minneapolis, MN
+  { lat: 38.63, lng: -90.20 },  // St. Louis, MO
+  { lat: 29.95, lng: -90.07 },  // New Orleans, LA
+  { lat: 36.16, lng: -86.78 },  // Nashville, TN
+  { lat: 40.76, lng: -111.89 }, // Salt Lake City, UT
+  { lat: 45.52, lng: -122.68 }, // Portland, OR
+  { lat: 43.62, lng: -116.20 }, // Boise, ID
+  { lat: 36.85, lng: -75.98 },  // Virginia Beach / Norfolk, VA
 ];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -141,8 +175,8 @@ function proximityBonus(
 
 /**
  * Pressure drivers (additive):
- *   Base                  +0.20
- *   Catch log             +0.12 per catch, capped at +0.55
+ *   Base                  +0.25
+ *   City proximity        up to +0.32 (within 50 km)
  *   Highway proximity     up to +0.28 (within 60 km)
  *   Park proximity        up to +0.18 (within 40 km)
  *
@@ -150,10 +184,12 @@ function proximityBonus(
  *   moderate access       −0.15
  *   hike required         −0.38
  */
-export function computeSpotPressure(spot: FishingSpot, catches: CatchLog[]): number {
-  const catchCount = catches.filter((c) => c.spotId === spot.id).length;
-  const catchPressure = Math.min(catchCount * 0.12, 0.55);
+export function computeSpotPressure(spot: FishingSpot): number {
+  if (spot.pressureOverride !== undefined) {
+    return spot.pressureOverride;
+  }
 
+  const cityBonus = proximityBonus(spot.lat, spot.lng, MAJOR_CITY_ANCHORS, 50, 0.32);
   const hwBonus = proximityBonus(spot.lat, spot.lng, HIGHWAY_ANCHORS, 60, 0.28);
   const parkBonus = proximityBonus(spot.lat, spot.lng, PARK_ANCHORS, 40, 0.18);
 
@@ -164,18 +200,18 @@ export function computeSpotPressure(spot: FishingSpot, catches: CatchLog[]): num
       ? 0.15
       : 0;
 
-  return Math.max(0, Math.min(1, 0.2 + catchPressure + hwBonus + parkBonus - diffPenalty));
+  return Math.max(0, Math.min(1, 0.25 + cityBonus + hwBonus + parkBonus - diffPenalty));
 }
 
 /**
  * Build the full heatmap point set:
- *  1. Per-spot pressure circles derived from catches + access + infrastructure
- *  2. Background highway corridor blobs
- *  3. Background park / recreation area blobs
+ *  1. Per-spot pressure circles derived from access + infrastructure
+ *  2. Background major city high-pressure blobs (0.88)
+ *  3. Background highway corridor blobs
+ *  4. Background park / recreation area blobs
  */
 export function computePressurePoints(
-  spots: FishingSpot[],
-  catches: CatchLog[]
+  spots: FishingSpot[]
 ): HeatmapPoint[] {
   const points: HeatmapPoint[] = [];
 
@@ -183,9 +219,13 @@ export function computePressurePoints(
     points.push({
       lat: spot.lat,
       lng: spot.lng,
-      pressure: computeSpotPressure(spot, catches),
+      pressure: computeSpotPressure(spot),
       radius: 42,
     });
+  }
+
+  for (const city of MAJOR_CITY_ANCHORS) {
+    points.push({ lat: city.lat, lng: city.lng, pressure: 0.88, radius: 75 });
   }
 
   for (const anchor of HIGHWAY_ANCHORS) {

@@ -37,10 +37,10 @@ function FishingMapApp() {
     setCatches(getCatches());
   }, []);
 
-  // Recompute heatmap pressure whenever spots or catches change
+  // Recompute heatmap pressure whenever spots change
   const heatmapData = useMemo(
-    () => computePressurePoints(spots, catches),
-    [spots, catches]
+    () => computePressurePoints(spots),
+    [spots]
   );
 
   const handleMapClick = (lat: number, lng: number) => {

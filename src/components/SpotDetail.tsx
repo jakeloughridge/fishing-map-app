@@ -56,7 +56,7 @@ export const SpotDetail: React.FC<SpotDetailProps> = ({ spot, catches, onLogCatc
   }, [spot.id]);
 
   const spotCatches = catches.filter((c) => c.spotId === spot.id);
-  const pressure = computeSpotPressure(spot, catches);
+  const pressure = computeSpotPressure(spot);
   const pressurePercent = Math.round(pressure * 100);
 
   const pressureColor =
@@ -182,8 +182,7 @@ export const SpotDetail: React.FC<SpotDetailProps> = ({ spot, catches, onLogCatc
           />
         </div>
         <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
-          Driven by {spotCatches.length} logged catch{spotCatches.length !== 1 ? 'es' : ''},
-          {' '}{spot.accessDifficulty === 'hike' ? 'remote hike-in location' : spot.accessDifficulty === 'moderate' ? 'moderate trail access' : 'easy road access'},
+          Driven by regional location, {spot.accessDifficulty === 'hike' ? 'remote hike-in terrain' : spot.accessDifficulty === 'moderate' ? 'moderate trail access' : 'easy road access'},
           {' '}and nearby infrastructure.
         </p>
       </div>
@@ -239,12 +238,14 @@ export const SpotDetail: React.FC<SpotDetailProps> = ({ spot, catches, onLogCatc
 
       {/* Field notes */}
       {spot.notes && (
-        <div className="mb-5 bg-card border border-border p-4 rounded-lg relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-1 h-full bg-accent" />
+        <div className="mb-5 bg-card border border-border p-4 rounded-lg relative">
+          <div className="absolute top-0 left-0 w-1 h-full bg-accent rounded-l-lg" />
           <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
             Field Notes
           </h3>
-          <p className="text-foreground leading-relaxed text-sm">{spot.notes}</p>
+          <div className="min-h-[140px] max-h-56 overflow-y-auto pr-2">
+            <p className="text-foreground leading-relaxed text-sm whitespace-pre-wrap">{spot.notes}</p>
+          </div>
         </div>
       )}
 
