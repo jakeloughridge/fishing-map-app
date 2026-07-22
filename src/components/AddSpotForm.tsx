@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SPECIES_DATA } from '@/data/species';
 import { FishingSpot, AccessDifficulty } from '@/data/spots';
-import { Car, Footprints, MountainSnow, Droplet, Fish, Check } from 'lucide-react';
+import { detectWaterBodyName } from '@/data/waterLookup';
+import { Car, Footprints, MountainSnow, Droplet, Fish, Check, Sparkles, Loader2 } from 'lucide-react';
 
 interface AddSpotFormProps {
   latLng: { lat: number; lng: number };
@@ -41,9 +42,32 @@ const ACCESS_OPTIONS: {
 
 export const AddSpotForm: React.FC<AddSpotFormProps> = ({ latLng, onSave, onCancel }) => {
   const [name, setName] = useState('');
+  const [isDetecting, setIsDetecting] = useState(true);
+  const [autoDetected, setAutoDetected] = useState(false);
   const [notes, setNotes] = useState('');
   const [selectedSpecies, setSelectedSpecies] = useState<string[]>([]);
   const [accessDifficulty, setAccessDifficulty] = useState<AccessDifficulty>('easy');
+
+  // Auto-detect water body name whenever pinned coordinates change
+  useEffect(() => {
+    let active = true;
+    setIsDetecting(true);
+    setAutoDetected(false);
+
+    detectWaterBodyName(latLng.lat, latLng.lng).then((detectedName) => {
+      if (active) {
+        setIsDetecting(false);
+        if (detectedName) {
+          setName(detectedName);
+          setAutoDetected(true);
+        }
+      }
+    });
+
+    return () => {
+      active = false;
+    };
+  }, [latLng]);
 
   const handleToggleSpecies = (speciesName: string) => {
     setSelectedSpecies((prev) =>
@@ -91,15 +115,32 @@ export const AddSpotForm: React.FC<AddSpotFormProps> = ({ latLng, onSave, onCanc
         {/* 1. Name of Body of Water */}
         <div className="space-y-2">
           <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center justify-between">
-            <span>1. Name of Body of Water</span>
+            <span className="flex items-center gap-1.5">
+              <span>1. Name of Body of Water</span>
+              {isDetecting && (
+                <span className="inline-flex items-center gap-1 text-[11px] font-mono normal-case text-cyan-400 animate-pulse">
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                  detecting...
+                </span>
+              )}
+              {autoDetected && !isDetecting && (
+                <span className="inline-flex items-center gap-1 text-[10px] font-mono normal-case text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/30">
+                  <Sparkles className="w-2.5 h-2.5 text-emerald-400" />
+                  Auto-detected from map
+                </span>
+              )}
+            </span>
             <span className="text-cyan-400 text-[11px] font-normal normal-case">*Required</span>
           </label>
           <input
             type="text"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => {
+              setName(e.target.value);
+              setAutoDetected(false);
+            }}
             className="w-full bg-input/50 border border-border rounded-lg px-4 py-3 text-foreground text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all placeholder:font-normal"
-            placeholder="e.g. Lake Erie, Kenai River, Chesapeake Bay..."
+            placeholder={isDetecting ? "Detecting water body name..." : "e.g. Lake Erie, Kenai River, Chesapeake Bay..."}
             required
             autoFocus
           />
