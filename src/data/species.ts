@@ -408,5 +408,29 @@ export const SPECIES_DATA: FishSpecies[] = [
       { name: "Small Inline Spinner", setup: "1/8oz Roostertail or Panther Martin in silver/white, 6lb line", tip: "Steady retrieve through schooling fish near bridge pilings and dock shadows" },
       { name: "Micro Tube Jig", setup: "1/16oz jig head + 1.5\" white/chartreuse tube plastic", tip: "Vertical jigging along channel edges and breaklines" }
     ]
+  },
+  {
+    name: "Black Sea Bass",
+    color: "#1e293b", // Dark Slate / Steel Navy
+    description: "Structure-loving Atlantic bottom fish with dark scales, iridescent blue halos, and sharp spines. Highly aggressive near wrecks and reefs; prized for sweet white meat.",
+    season: "Late Spring through Autumn (May–November)",
+    habitat: "Artificial reefs, shipwrecks, rocky ledges, deep channel humps (30–120ft)",
+    bestRigs: [
+      { name: "High-Low Rig & Squid Strip", setup: "2-hook high-low dropper rig, 2–4oz bank sinker, 2/0 octopus hooks, 2\" fresh squid strips or clam", tip: "Bounce bottom continuously near wreck edges — sea bass strike aggressively on the drop" },
+      { name: "Metal Jig & Gulp! Teaser", setup: "2oz AVA jig or Savage Gear diamond spoon + 3\" pink/chartreuse Gulp! Swimming Mullet 12\" above", tip: "Vertical jig directly over wreck structure; hold tight on double headers" },
+      { name: "Carolina Bottom Drift", setup: "2oz inline egg sinker, 24\" 30lb fluorocarbon leader, 3/0 circle hook, live mummichog or crab", tip: "Drift along hard bottom transitions and boulder fields" }
+    ]
+  },
+  {
+    name: "Tautog",
+    color: "#475569", // Charcoal Slate / Blackfish
+    description: "The 'Blackfish'. Heavy-bodied, crushing bottom fish with thick lips and human-like teeth. Infamous for stealing bait instantly and diving into wreck structure.",
+    season: "Autumn peak (October–December), Spring run (April–May)",
+    habitat: "Shipwrecks, boulder fields, bridge pilings, jetty rocks, deep stone reefs",
+    bestRigs: [
+      { name: "Tautog Jig & Green Crab", setup: "1–2oz flat-bottom tautog jig, 3/0 heavy hook, half a fresh green crab or fiddler crab", tip: "Drop directly onto wreck structure; hold rod steady and set hook hard on the first solid thump" },
+      { name: "Tog Snafu / Slider Rig", setup: "Tandem 3/0 circle hooks on 50lb fluorocarbon, 4oz bank sinker, whole asian shore crab or split green crab", tip: "Anchor dead-still over wreck edges; give zero slack — toggs dive into rocks instantly" },
+      { name: "High-Low Bottom Rig", setup: "3oz sinker, 2x 2/0 short-shank hooks, 40lb leader, fresh clam or crab meat", tip: "Feel for subtle nibbles before the crush — set hook fast to pull fish out of rocks" }
+    ]
   }
 ];
