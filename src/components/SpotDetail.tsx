@@ -7,7 +7,7 @@ import { fetchWeather, computeBitingScore, getBitingRating, WeatherData } from '
 import {
   MapPin, Calendar, ChevronDown, ChevronUp,
   CheckCircle2, Fish, Footprints, Car, MountainSnow,
-  Thermometer, Waves,
+  Thermometer, Waves, Anchor,
 } from 'lucide-react';
 
 interface SpotDetailProps {
@@ -202,33 +202,46 @@ export const SpotDetail: React.FC<SpotDetailProps> = ({ spot, catches, onLogCatc
           <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">
             Catch History ({spotCatches.length})
           </h3>
-          <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+          <div className="space-y-2">
             {[...spotCatches].reverse().map((c) => {
               const sp = SPECIES_DATA.find((s) => s.name === c.species);
               return (
                 <div
                   key={c.id}
-                  className="flex items-start gap-3 bg-secondary/30 border border-border/50 rounded-lg p-3"
+                  className="flex flex-col gap-2 bg-secondary/30 border border-border/50 rounded-xl p-3"
                 >
-                  <div
-                    className="w-2.5 h-2.5 rounded-full mt-1 shrink-0"
-                    style={{ backgroundColor: sp?.color ?? '#0f766e' }}
-                  />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-baseline justify-between gap-2">
-                      <span className="font-semibold text-sm text-foreground truncate">{c.species}</span>
-                      <span className="text-xs text-muted-foreground shrink-0">
-                        {new Date(c.date).toLocaleDateString()}
-                      </span>
-                    </div>
-                    <div className="flex gap-3 text-xs text-muted-foreground mt-0.5">
-                      {c.weight && <span>{c.weight} lbs</span>}
-                      {c.length && <span>{c.length}"</span>}
-                      {c.conditions && (
-                        <span className="truncate italic">{c.conditions}</span>
+                  <div className="flex items-start gap-3">
+                    <div
+                      className="w-2.5 h-2.5 rounded-full mt-1 shrink-0"
+                      style={{ backgroundColor: sp?.color ?? '#0f766e' }}
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-baseline justify-between gap-2">
+                        <span className="font-bold text-sm text-foreground truncate">{c.species}</span>
+                        <span className="text-[11px] text-muted-foreground shrink-0 font-mono">
+                          {new Date(c.date).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-muted-foreground mt-0.5">
+                        {c.weight && <span className="font-semibold text-foreground">{c.weight} lbs</span>}
+                        {c.length && <span className="font-semibold text-foreground">{c.length}"</span>}
+                        {c.conditions && (
+                          <span className="truncate italic">{c.conditions}</span>
+                        )}
+                      </div>
+                      {c.rigBaitUsed && (
+                        <div className="mt-1.5 text-xs font-semibold text-cyan-400 bg-cyan-500/10 border border-cyan-500/30 px-2 py-1 rounded-md flex items-center gap-1.5">
+                          <Anchor className="w-3 h-3 text-cyan-400 shrink-0" />
+                          <span className="truncate">Lure/Bait: {c.rigBaitUsed}</span>
+                        </div>
                       )}
                     </div>
                   </div>
+                  {c.imageUrl && (
+                    <div className="rounded-lg overflow-hidden border border-border/60 max-h-40 bg-black/40">
+                      <img src={c.imageUrl} alt={c.species} className="w-full h-full object-cover" loading="lazy" />
+                    </div>
+                  )}
                 </div>
               );
             })}

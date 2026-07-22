@@ -5,6 +5,8 @@ export type CatchLog = {
   weight: number | null; // lbs
   length: number | null; // inches
   conditions: string;
+  rigBaitUsed?: string;
+  imageUrl?: string;
   date: string; // ISO string
 };
 
