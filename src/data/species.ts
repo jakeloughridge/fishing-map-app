@@ -432,5 +432,17 @@ export const SPECIES_DATA: FishSpecies[] = [
       { name: "Tog Snafu / Slider Rig", setup: "Tandem 3/0 circle hooks on 50lb fluorocarbon, 4oz bank sinker, whole asian shore crab or split green crab", tip: "Anchor dead-still over wreck edges; give zero slack — toggs dive into rocks instantly" },
       { name: "High-Low Bottom Rig", setup: "3oz sinker, 2x 2/0 short-shank hooks, 40lb leader, fresh clam or crab meat", tip: "Feel for subtle nibbles before the crush — set hook fast to pull fish out of rocks" }
     ]
+  },
+  {
+    name: "Lake Trout",
+    color: "#0284c7", // Deep Ocean Slate Blue / Mackinaw
+    description: "Deep-water coldwater apex predator ('Mackinaw'). Thrives in cold glacial lakes and Great Lakes basins; notorious for aggressive strikes on white tube jigs, spoons, and trolling rigs.",
+    season: "Spring through Autumn (Spring shallow near shore, Summer deep trolling 50–150ft)",
+    habitat: "Deep lake basins, glacial lakes, rocky humps, thermoclines 45–55°F",
+    bestRigs: [
+      { name: "White Tube Jig", setup: "1–2oz heavy jig head, 4–6\" white or pearl salt-impregnated tube, 15lb fluorocarbon leader", tip: "Drop directly to the bottom in 60–120ft of water; lift 3ft and reel fast — Lake Trout crush fleeing tubes on the rise" },
+      { name: "Downrigger Spoon Trolling", setup: "1/2oz Acme Kastmaster or Silver Sutton Spoon, 8lb leader, downrigger set 10ft above thermocline", tip: "Troll slow at 1.5–2.0 mph through deep lake basins near bait schools" },
+      { name: "Vertical Sonar Jigging", setup: "1oz Hopkins spoon or Rapala Jigging Rap in silver/cyan, braided line with 12lb fluorocarbon", tip: "Mark fish on sonar; drop directly into the mark and rip jig 2ft up" }
+    ]
   }
 ];

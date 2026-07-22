@@ -14,7 +14,7 @@ export type FishingSpot = {
 };
 
 // Changing this key forces all browsers to start fresh (old key is simply abandoned)
-const STORAGE_KEY = 'fishing_spots_v29';
+const STORAGE_KEY = 'fishing_spots_v30';
 
 // Spots spread across the continental US & Canada
 const DEFAULT_SPOTS: FishingSpot[] = [
@@ -35,8 +35,8 @@ const DEFAULT_SPOTS: FishingSpot[] = [
     name: 'Salmon River — Pulaski & Douglaston Run, NY',
     lat: 43.5658,
     lng: -76.1384,
-    species: ['King Salmon', 'Coho Salmon', 'Brown Trout', 'Rainbow Trout', 'Cutthroat Trout'],
-    notes: 'World-class Great Lakes salmon and steelhead migratory run. Massive King Salmon (Chinook) and Coho stack up in deep gravel runs every autumn, followed by winter and spring Steelhead.',
+    species: ['King Salmon', 'Coho Salmon', 'Brown Trout', 'Rainbow Trout', 'Lake Trout', 'Cutthroat Trout'],
+    notes: 'World-class Great Lakes salmon, lake trout, and steelhead migratory run. Massive King Salmon (Chinook), Coho, and deep Lake Trout stack up in deep gravel runs and Lake Ontario basins.',
     dateAdded: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
     isUserAdded: false,
     accessDifficulty: 'easy',
@@ -46,8 +46,8 @@ const DEFAULT_SPOTS: FishingSpot[] = [
     name: 'Lake Erie — Buffalo Harbor & Outer Breakwalls, NY',
     lat: 42.8715,
     lng: -78.8955,
-    species: ['Smallmouth Bass', 'Walleye', 'Yellow Perch', 'Sturgeon', 'Carp'],
-    notes: 'Ranked as one of America\'s #1 Smallmouth Bass fisheries. Monster bronze-backs, trophy Walleye, Yellow Perch, and Carp thrive along the harbor breakwalls and rock reefs.',
+    species: ['Smallmouth Bass', 'Walleye', 'Lake Trout', 'Yellow Perch', 'Sturgeon', 'Carp'],
+    notes: 'Ranked as one of America\'s #1 Smallmouth Bass fisheries. Monster bronze-backs, deep Lake Trout, trophy Walleye, Yellow Perch, and Carp thrive along the harbor breakwalls and rock reefs.',
     dateAdded: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
     isUserAdded: false,
     accessDifficulty: 'easy',
@@ -57,8 +57,8 @@ const DEFAULT_SPOTS: FishingSpot[] = [
     name: 'Lake Champlain — Ticonderoga & South Bay, NY',
     lat: 43.8475,
     lng: -73.3980,
-    species: ['Largemouth Bass', 'Smallmouth Bass', 'Northern Pike', 'Crappie', 'Bluegill', 'Walleye'],
-    notes: 'Nationally renowned bass tournament destination. Lush shallow weed beds, rock drop-offs, and timber hold heavy Largemouth Bass, Northern Pike, and panfish.',
+    species: ['Largemouth Bass', 'Smallmouth Bass', 'Lake Trout', 'Northern Pike', 'Crappie', 'Bluegill', 'Walleye'],
+    notes: 'Nationally renowned bass and lake trout tournament destination. Deep coldwater basins hold wild Lake Trout, while lush shallow weed beds hold heavy Largemouth Bass and Northern Pike.',
     dateAdded: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
     isUserAdded: false,
     accessDifficulty: 'easy',
@@ -502,8 +502,8 @@ const DEFAULT_SPOTS: FishingSpot[] = [
     name: 'Kenai River — Soldotna Bridge Park, AK',
     lat: 60.48,
     lng: -151.07,
-    species: ['King Salmon', 'Sockeye Salmon', 'Coho Salmon', 'Pink Salmon', 'Chum Salmon', 'Rainbow Trout', 'Cutthroat Trout'],
-    notes: 'World-famous turquoise glacial river on Alaska\'s Kenai Peninsula. Legendary runs of King Salmon, Sockeye, Coho, Pink, and Chum salmon, plus monster trophy Rainbow Trout (30"+) feeding on salmon eggs and flesh.',
+    species: ['King Salmon', 'Sockeye Salmon', 'Coho Salmon', 'Pink Salmon', 'Chum Salmon', 'Lake Trout', 'Rainbow Trout', 'Cutthroat Trout'],
+    notes: 'World-famous turquoise glacial river on Alaska\'s Kenai Peninsula. Legendary runs of King Salmon, Sockeye, Coho, Pink, and Chum salmon, plus trophy Lake Trout (Mackinaw) and monster Rainbow Trout (30"+) feeding on salmon eggs and flesh.',
     dateAdded: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
     isUserAdded: false,
     accessDifficulty: 'easy',
@@ -513,8 +513,8 @@ const DEFAULT_SPOTS: FishingSpot[] = [
     name: 'Lake St. Clair — Anchor Bay, MI',
     lat: 42.66,
     lng: -82.72,
-    species: ['Smallmouth Bass', 'Walleye', 'Muskellunge', 'Northern Pike', 'Yellow Perch', 'Crappie', 'Bluegill'],
-    notes: 'Premier freshwater fishery connecting Lake Huron and Lake Erie. World-renowned shallow-water Smallmouth Bass & Muskellunge factory with vast cabbage grass beds and sand flats, plus trophy Walleye trolling, Yellow Perch, and Northern Pike.',
+    species: ['Smallmouth Bass', 'Walleye', 'Lake Trout', 'Muskellunge', 'Northern Pike', 'Yellow Perch', 'Crappie', 'Bluegill'],
+    notes: 'Premier freshwater fishery connecting Lake Huron and Lake Erie. World-renowned shallow-water Smallmouth Bass & Muskellunge factory with vast cabbage grass beds and sand flats, plus trophy Lake Trout, Walleye trolling, Yellow Perch, and Northern Pike.',
     dateAdded: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
     isUserAdded: false,
     accessDifficulty: 'easy',
@@ -537,8 +537,8 @@ const DEFAULT_SPOTS: FishingSpot[] = [
     name: 'Blue Mesa Reservoir — Iola Basin, CO',
     lat: 38.47,
     lng: -107.25,
-    species: ['Rainbow Trout', 'Brown Trout', 'Cutthroat Trout'],
-    notes: 'Colorado\'s largest body of water and premier trophy Mackinaw (Lake Trout) and Kokanee Salmon fishery. Deep trolling along the Iola and Cebolla basins, plus monster wild Rainbow, Brown, and Cutthroat Trout near river inlets in spring and fall.',
+    species: ['Lake Trout', 'Rainbow Trout', 'Brown Trout', 'Cutthroat Trout'],
+    notes: 'Colorado\'s largest body of water and premier trophy Mackinaw (Lake Trout) and Kokanee Salmon fishery. Deep trolling along the Iola and Cebolla basins for massive 40"+ Lake Trout, plus wild Rainbow, Brown, and Cutthroat Trout near river inlets.',
     dateAdded: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
     isUserAdded: false,
     accessDifficulty: 'easy',
