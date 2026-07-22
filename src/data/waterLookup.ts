@@ -24,10 +24,51 @@ function getDistanceMiles(lat1: number, lon1: number, lat2: number, lon2: number
 }
 
 /**
- * Automatically detects the name of a body of water based on pinned coordinates
+ * Automatically detects the exact name of a body of water based on pinned coordinates
  */
 export async function detectWaterBodyName(lat: number, lng: number): Promise<string> {
-  // 1. Check proximity to known spots in our database first (< 25 miles)
+  // 1. Try OpenStreetMap Overpass API for exact water feature geometry (natural=water, waterway=*)
+  try {
+    const query = `[out:json][timeout:6];(
+      relation["natural"="water"](around:4000, ${lat}, ${lng});
+      way["natural"="water"](around:4000, ${lat}, ${lng});
+      relation["waterway"](around:4000, ${lat}, ${lng});
+      way["waterway"](around:4000, ${lat}, ${lng});
+    );out tags;`;
+
+    const url = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`;
+    const res = await fetch(url, {
+      headers: {
+        'User-Agent': 'FishMapperApp/1.0 (https://github.com/jakeloughridge/fishing-map-app)',
+      },
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data.elements) && data.elements.length > 0) {
+        const names = data.elements
+          .map((e: { tags?: { name?: string } }) => e.tags && e.tags.name)
+          .filter((name: string | undefined): name is string => Boolean(name && name.trim()));
+
+        // Prioritize names that contain explicit water keywords (e.g. "Lake Anna", "Kenai River")
+        const bestWaterName = names.find((name: string) =>
+          WATER_KEYWORDS.some((kw) => name.toLowerCase().includes(kw))
+        );
+
+        if (bestWaterName) {
+          return bestWaterName;
+        }
+
+        if (names.length > 0) {
+          return names[0];
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('Overpass water query skipped:', err);
+  }
+
+  // 2. Check proximity to known spots in our database (< 15 miles)
   const knownSpots = getSpots();
   let closestSpotName = '';
   let minDistance = Infinity;
@@ -40,14 +81,14 @@ export async function detectWaterBodyName(lat: number, lng: number): Promise<str
     }
   }
 
-  if (minDistance <= 25 && closestSpotName) {
+  if (minDistance <= 15 && closestSpotName) {
     return closestSpotName;
   }
 
-  // 2. Query Nominatim Reverse Geocoding API
+  // 3. Fallback: Deep Nominatim Reverse Geocoding at Zoom 18
   try {
     const res = await fetch(
-      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=14&addressdetails=1`,
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&namedetails=1`,
       {
         headers: {
           'User-Agent': 'FishMapperApp/1.0',
@@ -59,7 +100,19 @@ export async function detectWaterBodyName(lat: number, lng: number): Promise<str
       const data = await res.json();
       const addr = data.address || {};
 
-      // Direct water feature properties
+      // Check namedetails or leisure property (e.g. "Pleasants Landing at Lake Anna")
+      const candidateName = data.namedetails?.name || addr.leisure || data.name || '';
+      if (candidateName) {
+        const parts = candidateName.split(' at ');
+        if (parts.length > 1 && WATER_KEYWORDS.some((kw) => parts[1].toLowerCase().includes(kw))) {
+          return parts[1];
+        }
+        if (WATER_KEYWORDS.some((kw) => candidateName.toLowerCase().includes(kw))) {
+          return candidateName;
+        }
+      }
+
+      // Check address properties
       const waterFeature =
         addr.water ||
         addr.river ||
@@ -73,38 +126,13 @@ export async function detectWaterBodyName(lat: number, lng: number): Promise<str
       if (waterFeature) {
         return waterFeature;
       }
-
-      // Check display_name tokens for water keywords
-      const displayName = data.display_name || '';
-      const parts = displayName.split(',').map((p: string) => p.trim());
-
-      for (const part of parts) {
-        const lower = part.toLowerCase();
-        if (WATER_KEYWORDS.some((kw) => lower.includes(kw))) {
-          return part;
-        }
-      }
-
-      // Check if place name has a water keyword
-      if (data.name) {
-        const lowerName = data.name.toLowerCase();
-        if (WATER_KEYWORDS.some((kw) => lowerName.includes(kw))) {
-          return data.name;
-        }
-      }
-
-      // If location returns a nearby town/county, suggest a clean water body name
-      const locationArea = addr.town || addr.city || addr.county || addr.state;
-      if (locationArea) {
-        return `${locationArea} Waters`;
-      }
     }
   } catch (err) {
-    console.warn('Reverse geocode water lookup skipped:', err);
+    console.warn('Nominatim fallback lookup skipped:', err);
   }
 
-  // Fallback to nearest known spot if distance <= 60 miles
-  if (minDistance <= 60 && closestSpotName) {
+  // Fallback to nearest known spot if within 40 miles
+  if (minDistance <= 40 && closestSpotName) {
     return closestSpotName;
   }
 
