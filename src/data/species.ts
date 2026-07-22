@@ -444,5 +444,29 @@ export const SPECIES_DATA: FishSpecies[] = [
       { name: "Downrigger Spoon Trolling", setup: "1/2oz Acme Kastmaster or Silver Sutton Spoon, 8lb leader, downrigger set 10ft above thermocline", tip: "Troll slow at 1.5–2.0 mph through deep lake basins near bait schools" },
       { name: "Vertical Sonar Jigging", setup: "1oz Hopkins spoon or Rapala Jigging Rap in silver/cyan, braided line with 12lb fluorocarbon", tip: "Mark fish on sonar; drop directly into the mark and rip jig 2ft up" }
     ]
+  },
+  {
+    name: "Bull Trout",
+    color: "#0d9488", // Teal / Glacial Cyan
+    description: "Native apex predator char of cold Pacific Northwest and Intermountain rivers. Large-headed ambush predator that feeds heavily on sculpins and smaller trout in clean, cold currents.",
+    season: "Late Spring through Autumn (May–October)",
+    habitat: "Cold glacial rivers, deep pool tailouts, headwater streams, alpine lake inlets",
+    bestRigs: [
+      { name: "White Sculpin Streamer", setup: "Size 2/0 articulated Sculpzilla or Galloup's Sex Dungeon, 12lb fluorocarbon, sinking tip line", tip: "Cast into deep pool seams and swing fast — Bull Trout hit streamers like freight trains" },
+      { name: "Heavy White Jig / Swimbait", setup: "3/8oz weedless swim jig, 3.5\" white paddletail, 15lb braid", tip: "Bounce along deep river ledges and log jam pockets" },
+      { name: "Nymphing / Bead Rig", setup: "Size 10 stonefly nymph + 10mm salmon egg bead 2\" above #6 hook", tip: "Dead-drift through deep tailouts downstream of spawning gravel" }
+    ]
+  },
+  {
+    name: "Mountain Whitefish",
+    color: "#94a3b8", // Pewter Silver
+    description: "Native Western salmonid with small downturned mouth and silvery scales. School in fast current seams and riffles; feeds heavily on aquatic nymphs.",
+    season: "Year-round, best Fall peak & Winter",
+    habitat: "Fast river riffles, gravel runs, deep pool heads, clear cold streams",
+    bestRigs: [
+      { name: "Euro Nymphing Rig", setup: "Size 16–18 Beadhead Pheasant Tail or Prince Nymph, 6X tippet, sighter line", tip: "Maintain tight-line drift through fast gravel riffles — feel for subtle ticks" },
+      { name: "Indicator Double Nymph", setup: "Size 14 Copper John + Size 18 Chironomid under micro float", tip: "Adjust depth so bottom nymph ticks rocks every 4–5 feet" },
+      { name: "Small Inline Spinner", setup: "Panther Martin 1/16oz gold blade, 4lb mono", tip: "Cast across current and slow-roll near bottom in deep runs" }
+    ]
   }
 ];
