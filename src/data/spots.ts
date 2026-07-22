@@ -580,8 +580,8 @@ export const getSpots = (): FishingSpot[] => {
       if (storedMatch) {
         return {
           ...def,
-          species: def.species,
-          notes: def.notes || storedMatch.notes,
+          species: storedMatch.species && storedMatch.species.length > 0 ? storedMatch.species : def.species,
+          notes: storedMatch.notes || def.notes,
           accessDifficulty: (storedMatch.accessDifficulty ?? def.accessDifficulty) as AccessDifficulty,
           pressureOverride: def.pressureOverride ?? storedMatch.pressureOverride,
         };
@@ -597,6 +597,21 @@ export const getSpots = (): FishingSpot[] => {
   const allSpots = [...defaultSpots, ...Array.from(spotMap.values())];
   localStorage.setItem(STORAGE_KEY, JSON.stringify(allSpots));
   return allSpots;
+};
+
+export const updateSpotSpecies = (spotId: string, updatedSpecies: string[]): FishingSpot[] => {
+  const current = getSpots();
+  const updated = current.map((s) => {
+    if (s.id === spotId) {
+      return { ...s, species: updatedSpecies };
+    }
+    return s;
+  });
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+  if (syncChannel) {
+    syncChannel.postMessage('sync');
+  }
+  return updated;
 };
 
 // Async fetch community-pinned spots from global cloud storage

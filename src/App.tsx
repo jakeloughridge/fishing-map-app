@@ -12,7 +12,7 @@ import { LogCatchForm } from '@/components/LogCatchForm';
 import { CommunityForum } from '@/components/CommunityForum';
 import { HeatmapLegend } from '@/components/HeatmapLegend';
 
-import { getSpots, saveSpot, FishingSpot } from '@/data/spots';
+import { getSpots, saveSpot, updateSpotSpecies, FishingSpot } from '@/data/spots';
 import { getCatches, logCatch, CatchLog } from '@/data/catches';
 import { computePressurePoints } from '@/data/heatmap';
 
@@ -88,28 +88,17 @@ function FishingMapApp() {
     setPendingLatLng(null);
   };
 
+  const handleUpdateSpotSpecies = (spotId: string, updatedSpecies: string[]) => {
+    const updated = updateSpotSpecies(spotId, updatedSpecies);
+    setSpots(updated);
+    if (selectedSpot && selectedSpot.id === spotId) {
+      setSelectedSpot({ ...selectedSpot, species: updatedSpecies });
+    }
+  };
+
   const handleLogCatch = (entry: CatchLog) => {
     logCatch(entry);
-    const updatedCatches = getCatches();
-    setCatches(updatedCatches);
-
-    // If the catch introduces a new species to the spot, update the spot's species list
-    if (selectedSpot && !selectedSpot.species.includes(entry.species)) {
-      const updatedSpots = spots.map((s) =>
-        s.id === selectedSpot.id
-          ? { ...s, species: [...s.species, entry.species] }
-          : s
-      );
-      import('@/data/spots').then(({ saveAllSpots }) => {
-        saveAllSpots(updatedSpots);
-      });
-      setSpots(updatedSpots);
-      setSelectedSpot((prev) =>
-        prev ? { ...prev, species: [...prev.species, entry.species] } : prev
-      );
-    }
-
-    // Go back to spot detail after logging
+    setCatches(getCatches());
     setSidebarMode('spot');
   };
 
@@ -156,6 +145,7 @@ function FishingMapApp() {
             spot={selectedSpot}
             catches={catches}
             onLogCatch={() => setSidebarMode('logCatch')}
+            onUpdateSpecies={handleUpdateSpotSpecies}
           />
         )}
         {sidebarMode === 'logCatch' && selectedSpot && (

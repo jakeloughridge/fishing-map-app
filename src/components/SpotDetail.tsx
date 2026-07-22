@@ -7,13 +7,14 @@ import { fetchWeather, computeBitingScore, getBitingRating, WeatherData } from '
 import {
   MapPin, Calendar, ChevronDown, ChevronUp,
   CheckCircle2, Fish, Footprints, Car, MountainSnow,
-  Thermometer, Waves, Anchor,
+  Thermometer, Waves, Anchor, Edit3, Save, Plus, X, ShieldAlert,
 } from 'lucide-react';
 
 interface SpotDetailProps {
   spot: FishingSpot;
   catches: CatchLog[];
   onLogCatch: () => void;
+  onUpdateSpecies?: (spotId: string, updatedSpecies: string[]) => void;
 }
 
 const ACCESS_LABELS: Record<string, { label: string; icon: React.ReactNode; color: string }> = {
@@ -34,6 +35,12 @@ const ACCESS_LABELS: Record<string, { label: string; icon: React.ReactNode; colo
   },
 };
 
+const isLocalhost = typeof window !== 'undefined' && (
+  window.location.hostname === 'localhost' ||
+  window.location.hostname === '127.0.0.1' ||
+  window.location.hostname === '[::1]'
+);
+
 function formatHour(h: number): string {
   const hour = Math.floor(h) % 24;
   const ampm = hour < 12 ? 'am' : 'pm';
@@ -41,10 +48,42 @@ function formatHour(h: number): string {
   return `${display}${ampm}`;
 }
 
-export const SpotDetail: React.FC<SpotDetailProps> = ({ spot, catches, onLogCatch }) => {
+export const SpotDetail: React.FC<SpotDetailProps> = ({ spot, catches, onLogCatch, onUpdateSpecies }) => {
   const [expandedSpecies, setExpandedSpecies] = useState<string | null>(null);
   const [weather, setWeather] = useState<WeatherData | null>(null);
-  const [weatherLoading, setWeatherLoading] = useState(true);
+  const [weatherLoading, setWeatherLoading] = useState<boolean>(true);
+
+  // Localhost Admin Species Editing state
+  const [isEditingSpecies, setIsEditingSpecies] = useState(false);
+  const [editedSpeciesList, setEditedSpeciesList] = useState<string[]>(spot.species);
+  const [customSpeciesInput, setCustomSpeciesInput] = useState('');
+
+  // Keep edited species list updated if spot changes
+  useEffect(() => {
+    setEditedSpeciesList(spot.species);
+  }, [spot]);
+
+  const handleToggleSpeciesItem = (name: string) => {
+    setEditedSpeciesList((prev) =>
+      prev.includes(name) ? prev.filter((s) => s !== name) : [...prev, name]
+    );
+  };
+
+  const handleAddCustomSpecies = (e: React.FormEvent) => {
+    e.preventDefault();
+    const name = customSpeciesInput.trim();
+    if (name && !editedSpeciesList.includes(name)) {
+      setEditedSpeciesList((prev) => [...prev, name]);
+      setCustomSpeciesInput('');
+    }
+  };
+
+  const handleSaveSpeciesEdit = () => {
+    if (onUpdateSpecies) {
+      onUpdateSpecies(spot.id, editedSpeciesList);
+    }
+    setIsEditingSpecies(false);
+  };
 
   useEffect(() => {
     setWeather(null);
@@ -264,9 +303,111 @@ export const SpotDetail: React.FC<SpotDetailProps> = ({ spot, catches, onLogCatc
 
       {/* Species + rigs */}
       <div>
-        <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">
-          Local Species & Tactics
-        </h3>
+        <div className="flex items-center justify-between gap-2 mb-3">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+            Local Species & Tactics
+          </h3>
+
+          {/* Localhost ONLY Admin Edit Button */}
+          {isLocalhost && (
+            <button
+              onClick={() => setIsEditingSpecies(!isEditingSpecies)}
+              className="text-xs font-bold px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30 transition-all flex items-center gap-1.5 shadow-xs"
+              title="Admin Localhost Only: Edit species found at this spot"
+            >
+              <Edit3 className="w-3.5 h-3.5" />
+              <span>Edit Species (Admin)</span>
+            </button>
+          )}
+        </div>
+
+        {/* Localhost Species Editing Drawer */}
+        {isLocalhost && isEditingSpecies && (
+          <div className="mb-4 bg-slate-900/90 border-2 border-amber-500/50 rounded-xl p-3.5 space-y-3 animate-in fade-in duration-200">
+            <div className="flex items-center justify-between border-b border-amber-500/30 pb-2">
+              <span className="text-xs font-extrabold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
+                <ShieldAlert className="w-4 h-4 text-amber-400" />
+                Admin Spot Species Manager (Localhost Only)
+              </span>
+              <button
+                onClick={() => setIsEditingSpecies(false)}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <p className="text-[11px] text-muted-foreground">
+              Select or deselect species inhabiting <strong className="text-foreground">{spot.name}</strong>. Add custom species as needed.
+            </p>
+
+            {/* Checklist of all species */}
+            <div className="max-h-48 overflow-y-auto pr-1 space-y-1.5 border border-border/50 rounded-lg p-2 bg-slate-950/60">
+              {SPECIES_DATA.map((s) => {
+                const isSelected = editedSpeciesList.includes(s.name);
+                return (
+                  <label
+                    key={s.name}
+                    className={`flex items-center justify-between p-2 rounded-lg text-xs cursor-pointer border transition-all ${
+                      isSelected
+                        ? 'bg-cyan-500/20 border-cyan-500/50 text-foreground font-bold'
+                        : 'bg-secondary/20 border-border/40 text-muted-foreground hover:bg-secondary/50'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="w-3 h-3 rounded-full shrink-0"
+                        style={{ backgroundColor: s.color }}
+                      />
+                      <span>{s.name}</span>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={() => handleToggleSpeciesItem(s.name)}
+                      className="rounded border-border text-cyan-500 focus:ring-cyan-500"
+                    />
+                  </label>
+                );
+              })}
+            </div>
+
+            {/* Add Custom Species */}
+            <form onSubmit={handleAddCustomSpecies} className="flex gap-2">
+              <input
+                type="text"
+                value={customSpeciesInput}
+                onChange={(e) => setCustomSpeciesInput(e.target.value)}
+                placeholder="Custom species name..."
+                className="flex-1 bg-input/60 border border-border rounded-lg px-2.5 py-1.5 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-cyan-500"
+              />
+              <button
+                type="submit"
+                className="px-3 py-1.5 bg-secondary hover:bg-secondary/80 text-foreground font-bold text-xs rounded-lg border border-border flex items-center gap-1"
+              >
+                <Plus className="w-3 h-3" />
+                Add
+              </button>
+            </form>
+
+            {/* Action Buttons */}
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-amber-500/30">
+              <button
+                onClick={() => setIsEditingSpecies(false)}
+                className="px-3 py-1.5 rounded-lg text-xs font-semibold text-muted-foreground hover:text-foreground"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveSpeciesEdit}
+                className="px-4 py-1.5 rounded-lg text-xs font-black bg-amber-500 text-slate-950 hover:bg-amber-400 shadow-md flex items-center gap-1.5"
+              >
+                <Save className="w-3.5 h-3.5 stroke-[2.5]" />
+                <span>Save Species Changes</span>
+              </button>
+            </div>
+          </div>
+        )}
 
         {spotSpeciesDetails.length === 0 ? (
           <div className="text-sm text-muted-foreground italic bg-secondary/30 p-4 rounded-lg">
