@@ -26,7 +26,7 @@ interface MapViewProps {
   onMarkerClick: (spot: FishingSpot) => void;
 }
 
-export const MapView: React.FC<MapViewProps> = ({
+const MapViewComponent: React.FC<MapViewProps> = ({
   spots,
   heatmapData,
   showMarkers,
@@ -212,32 +212,7 @@ export const MapView: React.FC<MapViewProps> = ({
         inner.addTo(layer);
       });
     }
-
-    // Render temporary pin for pending water spot if present
-    if (pendingLatLng) {
-      const pendingOuter = L.circleMarker([pendingLatLng.lat, pendingLatLng.lng], {
-        radius: 20,
-        fillColor: '#06b6d4',
-        color: '#22d3ee',
-        weight: 2,
-        fillOpacity: 0.35,
-        interactive: false,
-      });
-
-      const pendingInner = L.circleMarker([pendingLatLng.lat, pendingLatLng.lng], {
-        radius: 10,
-        fillColor: '#0891b2',
-        color: '#ffffff',
-        weight: 3,
-        opacity: 1,
-        fillOpacity: 1,
-        interactive: false,
-      });
-
-      pendingOuter.addTo(layer);
-      pendingInner.addTo(layer);
-    }
-  }, [spots, showMarkers, addMode, pendingLatLng, onMarkerClick]);
+  }, [spots, showMarkers, addMode, onMarkerClick]);
 
   // Redraw heatmap whenever data or visibility changes
   useEffect(() => {
@@ -273,3 +248,5 @@ export const MapView: React.FC<MapViewProps> = ({
     />
   );
 };
+
+export const MapView = React.memo(MapViewComponent);
