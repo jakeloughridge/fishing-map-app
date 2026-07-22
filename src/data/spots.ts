@@ -14,10 +14,66 @@ export type FishingSpot = {
 };
 
 // Changing this key forces all browsers to start fresh (old key is simply abandoned)
-const STORAGE_KEY = 'fishing_spots_v28';
+const STORAGE_KEY = 'fishing_spots_v29';
 
-// 20 spots spread across the continental US
+// Spots spread across the continental US & Canada
 const DEFAULT_SPOTS: FishingSpot[] = [
+  // ── New York Top 5 Premier Fisheries ────────────────────────────────────
+  {
+    id: 'spot-ny-1',
+    name: 'Montauk Point — The Surfcasting Capital, NY',
+    lat: 41.0710,
+    lng: -71.8569,
+    species: ['Striped Bass', 'Bluefish', 'Summer Flounder', 'Black Sea Bass', 'Tautog', 'Spanish Mackerel'],
+    notes: 'The Surfcasting Capital of the World. Legendary fall blitzes with trophy Striped Bass, Bluefish, Tautog, Black Sea Bass, and Summer Flounder crashing bait off the lighthouse rock ledges and rips.',
+    dateAdded: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    isUserAdded: false,
+    accessDifficulty: 'easy',
+  },
+  {
+    id: 'spot-ny-2',
+    name: 'Salmon River — Pulaski & Douglaston Run, NY',
+    lat: 43.5658,
+    lng: -76.1384,
+    species: ['King Salmon', 'Coho Salmon', 'Brown Trout', 'Rainbow Trout', 'Cutthroat Trout'],
+    notes: 'World-class Great Lakes salmon and steelhead migratory run. Massive King Salmon (Chinook) and Coho stack up in deep gravel runs every autumn, followed by winter and spring Steelhead.',
+    dateAdded: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    isUserAdded: false,
+    accessDifficulty: 'easy',
+  },
+  {
+    id: 'spot-ny-3',
+    name: 'Lake Erie — Buffalo Harbor & Outer Breakwalls, NY',
+    lat: 42.8715,
+    lng: -78.8955,
+    species: ['Smallmouth Bass', 'Walleye', 'Yellow Perch', 'Sturgeon', 'Carp'],
+    notes: 'Ranked as one of America\'s #1 Smallmouth Bass fisheries. Monster bronze-backs, trophy Walleye, Yellow Perch, and Carp thrive along the harbor breakwalls and rock reefs.',
+    dateAdded: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    isUserAdded: false,
+    accessDifficulty: 'easy',
+  },
+  {
+    id: 'spot-ny-4',
+    name: 'Lake Champlain — Ticonderoga & South Bay, NY',
+    lat: 43.8475,
+    lng: -73.3980,
+    species: ['Largemouth Bass', 'Smallmouth Bass', 'Northern Pike', 'Crappie', 'Bluegill', 'Walleye'],
+    notes: 'Nationally renowned bass tournament destination. Lush shallow weed beds, rock drop-offs, and timber hold heavy Largemouth Bass, Northern Pike, and panfish.',
+    dateAdded: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    isUserAdded: false,
+    accessDifficulty: 'easy',
+  },
+  {
+    id: 'spot-ny-5',
+    name: 'Oneida Lake — Sylvan Beach & Shoal Reefs, NY',
+    lat: 43.1812,
+    lng: -75.9870,
+    species: ['Walleye', 'Yellow Perch', 'Smallmouth Bass', 'Largemouth Bass', 'Carp', 'Catfish'],
+    notes: 'New York\'s premier Walleye factory. Shallow natural lake with extensive shoal reefs holding massive schools of Walleye, Yellow Perch, Smallmouth Bass, and Carp.',
+    dateAdded: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    isUserAdded: false,
+    accessDifficulty: 'easy',
+  },
   // ── Pacific Northwest ────────────────────────────────────────────────────
   {
     id: 'spot-pnw-1',
