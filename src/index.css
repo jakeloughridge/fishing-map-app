@@ -198,13 +198,6 @@
   }
 }
 
-.map-tiles {
-  filter: brightness(0.6) contrast(1.2) sepia(0.2) hue-rotate(180deg) saturate(0.8) invert(1);
-  will-change: transform, filter;
-  transform: translateZ(0);
-  backface-visibility: hidden;
-}
-
 .leaflet-container {
-  background-color: #0f172a !important;
+  background-color: #121b2d !important;
 }

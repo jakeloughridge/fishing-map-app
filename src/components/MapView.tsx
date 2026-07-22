@@ -52,23 +52,27 @@ const MapViewComponent: React.FC<MapViewProps> = ({
       zoomControl: false,
     }).setView([39.5, -96.0], 4);
 
-    // Fastly CDN backed tile layer with CSS navy dark filter & fallback
-    const primaryTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-      maxZoom: 20,
-      subdomains: 'abcd',
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-      className: 'map-tiles',
-      keepBuffer: 10,
-      updateWhenIdle: false,
-      updateWhenZooming: true,
-    });
+    // Primary: Esri Dark Gray Canvas (native deep navy blue tiles, no CSS filter hack needed)
+    const primaryTiles = L.tileLayer(
+      'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+      {
+        maxZoom: 16,
+        attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
+        keepBuffer: 10,
+        updateWhenIdle: false,
+        updateWhenZooming: true,
+      }
+    );
 
-    const fallbackTiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '&copy; OpenStreetMap contributors',
-      className: 'map-tiles',
-      keepBuffer: 10,
-    });
+    const fallbackTiles = L.tileLayer(
+      'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+      {
+        maxZoom: 19,
+        subdomains: 'abcd',
+        attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+        keepBuffer: 10,
+      }
+    );
 
     primaryTiles.on('tileerror', () => {
       if (!map.hasLayer(fallbackTiles)) {
@@ -135,9 +139,8 @@ const MapViewComponent: React.FC<MapViewProps> = ({
         }
       }
     } else {
-      if (draggableMarkerRef.current) {
+      if (draggableMarkerRef.current && map.hasLayer(draggableMarkerRef.current)) {
         map.removeLayer(draggableMarkerRef.current);
-        draggableMarkerRef.current = null;
       }
     }
   }, [addMode, pendingLatLng, onPinDrop]);
