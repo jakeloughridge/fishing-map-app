@@ -1,5 +1,5 @@
 import React from 'react';
-import { Layers, MapPin, Droplet } from 'lucide-react';
+import { Layers, MapPin, Droplet, MessageSquareText } from 'lucide-react';
 
 interface ToolbarProps {
   showMarkers: boolean;
@@ -7,6 +7,7 @@ interface ToolbarProps {
   showHeatmap: boolean;
   setShowHeatmap: (v: boolean) => void;
   onPinAtCenter?: () => void;
+  onOpenForum?: () => void;
 }
 
 export const Toolbar: React.FC<ToolbarProps> = ({
@@ -15,6 +16,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   showHeatmap,
   setShowHeatmap,
   onPinAtCenter,
+  onOpenForum,
 }) => {
   return (
     <div className="absolute top-6 left-1/2 -translate-x-1/2 z-[1000] flex flex-col items-center gap-2">
@@ -50,6 +52,17 @@ export const Toolbar: React.FC<ToolbarProps> = ({
             <Layers className="w-4 h-4" />
             Heatmap
           </button>
+
+          {onOpenForum && (
+            <button
+              onClick={onOpenForum}
+              className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-extrabold bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 shadow-md transition-all duration-200"
+              title="Open Reddit-Style Angler Q&A Forum"
+            >
+              <MessageSquareText className="w-4 h-4 fill-slate-950" />
+              <span>Angler Forum</span>
+            </button>
+          )}
 
           {onPinAtCenter && (
             <button

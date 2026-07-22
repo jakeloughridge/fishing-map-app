@@ -9,6 +9,7 @@ import { Sidebar } from '@/components/Sidebar';
 import { SpotDetail } from '@/components/SpotDetail';
 import { AddSpotForm } from '@/components/AddSpotForm';
 import { LogCatchForm } from '@/components/LogCatchForm';
+import { CommunityForum } from '@/components/CommunityForum';
 import { HeatmapLegend } from '@/components/HeatmapLegend';
 
 import { getSpots, saveSpot, FishingSpot } from '@/data/spots';
@@ -17,7 +18,7 @@ import { computePressurePoints } from '@/data/heatmap';
 
 const queryClient = new QueryClient();
 
-type SidebarMode = 'spot' | 'addForm' | 'logCatch' | null;
+type SidebarMode = 'spot' | 'addForm' | 'logCatch' | 'forum' | null;
 
 function FishingMapApp() {
   const [spots, setSpots] = useState<FishingSpot[]>([]);
@@ -132,6 +133,7 @@ function FishingMapApp() {
         showHeatmap={showHeatmap}
         setShowHeatmap={setShowHeatmap}
         onPinAtCenter={() => handlePinDrop(39.5, -96.0)}
+        onOpenForum={() => setSidebarMode('forum')}
       />
 
       <MapView
@@ -168,6 +170,13 @@ function FishingMapApp() {
             latLng={pendingLatLng}
             onSave={handleSaveSpot}
             onCancel={closeSidebar}
+          />
+        )}
+        {sidebarMode === 'forum' && (
+          <CommunityForum
+            spots={spots}
+            onSelectSpot={(spot) => handleMarkerClick(spot)}
+            onClose={closeSidebar}
           />
         )}
       </Sidebar>
