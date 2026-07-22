@@ -90,14 +90,23 @@ export const MapView: React.FC<MapViewProps> = ({
       iconAnchor: [22, 22],
     });
 
-    const initialPos = pendingLatLng ? [pendingLatLng.lat, pendingLatLng.lng] : [39.5, -96.0];
+    const center = map.getCenter();
+    const initialPos: [number, number] = pendingLatLng
+      ? [pendingLatLng.lat, pendingLatLng.lng]
+      : [center.lat, center.lng];
 
     if (!draggableMarkerRef.current) {
-      const marker = L.marker(initialPos as [number, number], {
+      const marker = L.marker(initialPos, {
         draggable: true,
         icon: waterPinIcon,
         zIndexOffset: 2000,
       }).addTo(map);
+
+      marker.bindTooltip('💧 Drag Me To Water', {
+        permanent: false,
+        direction: 'top',
+        className: 'custom-water-pin-tooltip',
+      });
 
       marker.on('dragend', (e) => {
         const ll = e.target.getLatLng();

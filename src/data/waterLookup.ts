@@ -32,6 +32,14 @@ function getDistanceMiles(lat1: number, lon1: number, lat2: number, lon2: number
  * prioritizing major water bodies (Bays, Lakes, Rivers, Sounds) over minor local creeks.
  */
 export async function detectWaterBodyName(lat: number, lng: number): Promise<string> {
+  // Guard against initial default center coordinates (geographic center of US in Kansas)
+  if (Math.abs(lat - 39.5) < 1.0 && Math.abs(lng - (-96.0)) < 4.0) {
+    return '';
+  }
+  if (Math.abs(lat - 39.8283) < 1.0 && Math.abs(lng - (-98.5795)) < 4.0) {
+    return '';
+  }
+
   // 1. Try OpenStreetMap Overpass API for water feature geometry around coordinates
   try {
     const query = `[out:json][timeout:6];(
