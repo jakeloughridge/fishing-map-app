@@ -142,14 +142,7 @@ export const MapView: React.FC<MapViewProps> = ({
     }
   }, [addMode, pendingLatLng, onPinDrop]);
 
-  // Smoothly pan map when pendingLatLng is set
-  useEffect(() => {
-    if (mapRef.current && pendingLatLng) {
-      mapRef.current.flyTo([pendingLatLng.lat, pendingLatLng.lng], Math.max(mapRef.current.getZoom(), 8), {
-        duration: 1.2,
-      });
-    }
-  }, [pendingLatLng]);
+
 
   // Map click handler — rebinds when addMode changes
   useEffect(() => {
