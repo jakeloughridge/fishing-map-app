@@ -90,27 +90,37 @@ export const MapView: React.FC<MapViewProps> = ({
       iconAnchor: [22, 22],
     });
 
-    const initialPos = pendingLatLng ? [pendingLatLng.lat, pendingLatLng.lng] : [39.5, -96.0];
+    if (addMode || pendingLatLng) {
+      const initialPos: [number, number] = pendingLatLng
+        ? [pendingLatLng.lat, pendingLatLng.lng]
+        : [map.getCenter().lat, map.getCenter().lng];
 
-    if (!draggableMarkerRef.current) {
-      const marker = L.marker(initialPos as [number, number], {
-        draggable: true,
-        icon: waterPinIcon,
-        zIndexOffset: 2000,
-      }).addTo(map);
+      if (!draggableMarkerRef.current) {
+        const marker = L.marker(initialPos, {
+          draggable: true,
+          icon: waterPinIcon,
+          zIndexOffset: 2000,
+        }).addTo(map);
 
-      marker.on('dragend', (e) => {
-        const ll = e.target.getLatLng();
-        onPinDrop(ll.lat, ll.lng);
-      });
+        marker.on('dragend', (e) => {
+          const ll = e.target.getLatLng();
+          onPinDrop(ll.lat, ll.lng);
+        });
 
-      draggableMarkerRef.current = marker;
+        draggableMarkerRef.current = marker;
+      } else {
+        draggableMarkerRef.current.setLatLng(initialPos);
+        if (!map.hasLayer(draggableMarkerRef.current)) {
+          draggableMarkerRef.current.addTo(map);
+        }
+      }
     } else {
-      if (pendingLatLng) {
-        draggableMarkerRef.current.setLatLng([pendingLatLng.lat, pendingLatLng.lng]);
+      if (draggableMarkerRef.current) {
+        map.removeLayer(draggableMarkerRef.current);
+        draggableMarkerRef.current = null;
       }
     }
-  }, [pendingLatLng, onPinDrop]);
+  }, [addMode, pendingLatLng, onPinDrop]);
 
   // Force Leaflet to recalculate viewport size whenever addMode or pendingLatLng changes
   useEffect(() => {

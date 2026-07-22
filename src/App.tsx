@@ -114,7 +114,11 @@ function FishingMapApp() {
         setShowMarkers={setShowMarkers}
         showHeatmap={showHeatmap}
         setShowHeatmap={setShowHeatmap}
-        onPinAtCenter={() => handlePinDrop(39.5, -96.0)}
+        addMode={addMode}
+        setAddMode={(val) => {
+          setAddMode(val);
+          if (val) closeSidebar();
+        }}
       />
 
       <MapView
