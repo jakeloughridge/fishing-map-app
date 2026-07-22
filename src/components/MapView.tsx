@@ -122,32 +122,12 @@ export const MapView: React.FC<MapViewProps> = ({
     }
   }, [addMode, pendingLatLng, onPinDrop]);
 
-  // Force Leaflet to recalculate viewport size whenever addMode or pendingLatLng changes
-  useEffect(() => {
-    if (!mapRef.current) return;
-    const timer = setTimeout(() => {
-      mapRef.current?.invalidateSize();
-    }, 150);
-    return () => clearTimeout(timer);
-  }, [addMode, pendingLatLng]);
-
-  // ResizeObserver on map container to continuously invalidate size on panel toggle
-  useEffect(() => {
-    if (!mapContainerRef.current || !mapRef.current) return;
-    const observer = new ResizeObserver(() => {
-      mapRef.current?.invalidateSize();
-    });
-    observer.observe(mapContainerRef.current);
-    return () => observer.disconnect();
-  }, []);
-
-  // Pan map when pendingLatLng changes
+  // Smoothly pan map when pendingLatLng is set
   useEffect(() => {
     if (mapRef.current && pendingLatLng) {
       mapRef.current.flyTo([pendingLatLng.lat, pendingLatLng.lng], Math.max(mapRef.current.getZoom(), 8), {
         duration: 1.2,
       });
-      mapRef.current.invalidateSize();
     }
   }, [pendingLatLng]);
 
