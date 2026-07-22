@@ -1,10 +1,14 @@
 import { getSpots } from '@/data/spots';
 
-const WATER_KEYWORDS = [
-  'lake', 'river', 'creek', 'bay', 'sound', 'reservoir', 'harbor',
-  'pond', 'slough', 'inlet', 'channel', 'swamp', 'ocean', 'gulf',
-  'sea', 'fjord', 'marsh', 'cove', 'basin', 'stream', 'fork', 'oxbow'
+const MAJOR_WATER_KEYWORDS = [
+  'bay', 'lake', 'sound', 'gulf', 'sea', 'ocean', 'reservoir', 'river', 'harbor', 'estuary', 'strait'
 ];
+
+const MINOR_WATER_KEYWORDS = [
+  'creek', 'branch', 'stream', 'cove', 'channel', 'slough', 'pond', 'swamp', 'oxbow', 'ditch', 'inlet'
+];
+
+const ALL_WATER_KEYWORDS = [...MAJOR_WATER_KEYWORDS, ...MINOR_WATER_KEYWORDS];
 
 /**
  * Calculates distance in miles between two lat/lng coordinates (Haversine formula)
@@ -24,16 +28,17 @@ function getDistanceMiles(lat1: number, lon1: number, lat2: number, lon2: number
 }
 
 /**
- * Automatically detects the exact name of a body of water based on pinned coordinates
+ * Automatically detects the name of a body of water based on pinned coordinates,
+ * prioritizing major water bodies (Bays, Lakes, Rivers, Sounds) over minor local creeks.
  */
 export async function detectWaterBodyName(lat: number, lng: number): Promise<string> {
-  // 1. Try OpenStreetMap Overpass API for exact water feature geometry (natural=water, waterway=*)
+  // 1. Try OpenStreetMap Overpass API for water feature geometry around coordinates
   try {
     const query = `[out:json][timeout:6];(
-      relation["natural"="water"](around:4000, ${lat}, ${lng});
-      way["natural"="water"](around:4000, ${lat}, ${lng});
-      relation["waterway"](around:4000, ${lat}, ${lng});
-      way["waterway"](around:4000, ${lat}, ${lng});
+      relation["natural"="water"](around:6000, ${lat}, ${lng});
+      way["natural"="water"](around:6000, ${lat}, ${lng});
+      relation["waterway"](around:6000, ${lat}, ${lng});
+      way["waterway"](around:6000, ${lat}, ${lng});
     );out tags;`;
 
     const url = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`;
@@ -50,13 +55,22 @@ export async function detectWaterBodyName(lat: number, lng: number): Promise<str
           .map((e: { tags?: { name?: string } }) => e.tags && e.tags.name)
           .filter((name: string | undefined): name is string => Boolean(name && name.trim()));
 
-        // Prioritize names that contain explicit water keywords (e.g. "Lake Anna", "Kenai River")
-        const bestWaterName = names.find((name: string) =>
-          WATER_KEYWORDS.some((kw) => name.toLowerCase().includes(kw))
+        // TIER 1: Prioritize MAJOR water bodies (Bay, Lake, River, Sound, Reservoir, Ocean, Gulf, Sea)
+        const majorMatch = names.find((name: string) =>
+          MAJOR_WATER_KEYWORDS.some((kw) => name.toLowerCase().includes(kw))
         );
 
-        if (bestWaterName) {
-          return bestWaterName;
+        if (majorMatch) {
+          return majorMatch;
+        }
+
+        // TIER 2: Secondary water bodies (Creek, Stream, Channel, Cove)
+        const minorMatch = names.find((name: string) =>
+          MINOR_WATER_KEYWORDS.some((kw) => name.toLowerCase().includes(kw))
+        );
+
+        if (minorMatch) {
+          return minorMatch;
         }
 
         if (names.length > 0) {
@@ -68,7 +82,7 @@ export async function detectWaterBodyName(lat: number, lng: number): Promise<str
     console.warn('Overpass water query skipped:', err);
   }
 
-  // 2. Check proximity to known spots in our database (< 15 miles)
+  // 2. Check proximity to known spots in our database (< 20 miles)
   const knownSpots = getSpots();
   let closestSpotName = '';
   let minDistance = Infinity;
@@ -81,7 +95,7 @@ export async function detectWaterBodyName(lat: number, lng: number): Promise<str
     }
   }
 
-  if (minDistance <= 15 && closestSpotName) {
+  if (minDistance <= 20 && closestSpotName) {
     return closestSpotName;
   }
 
@@ -104,10 +118,10 @@ export async function detectWaterBodyName(lat: number, lng: number): Promise<str
       const candidateName = data.namedetails?.name || addr.leisure || data.name || '';
       if (candidateName) {
         const parts = candidateName.split(' at ');
-        if (parts.length > 1 && WATER_KEYWORDS.some((kw) => parts[1].toLowerCase().includes(kw))) {
+        if (parts.length > 1 && ALL_WATER_KEYWORDS.some((kw) => parts[1].toLowerCase().includes(kw))) {
           return parts[1];
         }
-        if (WATER_KEYWORDS.some((kw) => candidateName.toLowerCase().includes(kw))) {
+        if (MAJOR_WATER_KEYWORDS.some((kw) => candidateName.toLowerCase().includes(kw))) {
           return candidateName;
         }
       }
