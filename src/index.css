@@ -197,3 +197,15 @@
     pointer-events: none;
   }
 }
+
+.custom-water-pin-icon {
+  cursor: grab !important;
+  pointer-events: auto !important;
+  user-select: none !important;
+}
+.custom-water-pin-icon * {
+  pointer-events: none !important;
+}
+.custom-water-pin-icon:active {
+  cursor: grabbing !important;
+}

@@ -79,15 +79,15 @@ export const MapView: React.FC<MapViewProps> = ({
     const waterPinIcon = L.divIcon({
       className: 'custom-water-pin-icon',
       html: `
-        <div style="position: relative; display: flex; align-items: center; justify-content: center; cursor: grab;">
-          <div style="position: absolute; width: 44px; height: 44px; background: rgba(6, 182, 212, 0.35); border-radius: 50%; border: 1.5px dashed #22d3ee; animation: pulse 2s infinite;"></div>
-          <div style="width: 32px; height: 32px; border-radius: 50%; background: #0891b2; border: 2.5px solid #ffffff; box-shadow: 0 10px 25px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; font-size: 15px;">
+        <div style="position: relative; display: flex; align-items: center; justify-content: center; cursor: grab; pointer-events: none;">
+          <div style="position: absolute; width: 48px; height: 48px; background: rgba(6, 182, 212, 0.35); border-radius: 50%; border: 2px dashed #22d3ee; animation: pulse 2s infinite; pointer-events: none;"></div>
+          <div style="width: 34px; height: 34px; border-radius: 50%; background: #0891b2; border: 3px solid #ffffff; box-shadow: 0 10px 25px rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; font-size: 16px; pointer-events: none;">
             💧
           </div>
         </div>
       `,
-      iconSize: [44, 44],
-      iconAnchor: [22, 22],
+      iconSize: [48, 48],
+      iconAnchor: [24, 24],
     });
 
     const center = map.getCenter();
@@ -99,8 +99,14 @@ export const MapView: React.FC<MapViewProps> = ({
       const marker = L.marker(initialPos, {
         draggable: true,
         icon: waterPinIcon,
-        zIndexOffset: 2000,
+        zIndexOffset: 3000,
+        autoPan: true,
       }).addTo(map);
+
+      // Force-enable Leaflet marker dragging
+      if (marker.dragging) {
+        marker.dragging.enable();
+      }
 
       marker.bindTooltip('💧 Drag Me To Water', {
         permanent: false,
@@ -115,6 +121,9 @@ export const MapView: React.FC<MapViewProps> = ({
 
       draggableMarkerRef.current = marker;
     } else {
+      if (draggableMarkerRef.current.dragging) {
+        draggableMarkerRef.current.dragging.enable();
+      }
       if (pendingLatLng) {
         draggableMarkerRef.current.setLatLng([pendingLatLng.lat, pendingLatLng.lng]);
       }
