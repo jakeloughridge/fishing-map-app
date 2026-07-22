@@ -5,6 +5,7 @@ export type FishSpecies = {
   bestRigs: { name: string; setup: string; tip: string }[];
   season: string;
   habitat: string;
+  subTypes?: string[];
 };
 
 export const SPECIES_DATA: FishSpecies[] = [
@@ -146,10 +147,50 @@ export const SPECIES_DATA: FishSpecies[] = [
     description: "Bottom-dwelling scavengers with exceptional smell. Thrive in murky, warm water.",
     season: "Summer peak",
     habitat: "Deep holes, muddy banks, below dams",
+    subTypes: ["Channel Catfish", "Blue Catfish", "Flathead Catfish", "Bullhead Catfish"],
     bestRigs: [
       { name: "Santee Rig", setup: '2oz inline sinker, 6" leader, 5/0 kahle hook, foam peg', tip: 'Float bait 4" off bottom in current seam' },
       { name: "Slip Sinker", setup: "2oz no-roll sinker, 3/0 Octopus hook, cut shad", tip: "Fresh-cut bait over clean sand bottom, open bail" },
       { name: "Punch Bait Rig", setup: "#6 treble with spring wire, commercial punch bait", tip: "Dip bait, punch spring into bait, deploy in current" }
+    ]
+  },
+  {
+    name: "Sturgeon",
+    color: "#475569", // Slate Grey
+    description: "Prehistoric, armor-plated bottom predator capable of reaching massive sizes over 100+ lbs. Relies on barbels to locate food in deep river channels and estuaries.",
+    season: "Spring & Fall peak (Year-round in deep channels)",
+    habitat: "Deep river channels, estuaries, tailwaters, river mouths",
+    subTypes: ["White Sturgeon", "Lake Sturgeon", "Atlantic Sturgeon", "Shortnose Sturgeon", "Shovelnose Sturgeon"],
+    bestRigs: [
+      { name: "Heavy River Sliding Sinker", setup: "6–12oz flat pyramid sinker, 5/0–8/0 circle hook, 80lb braided main line, 100lb leader, lamprey or squid bait", tip: "Anchor above deep river holes; let scent trail drift downstream — wait for steady pull before setting" },
+      { name: "Carolina Cut-Bait Rig", setup: "4oz egg sinker, 24\" 80lb fluorocarbon, 6/0 circle hook, fresh salmon roe or cut shad", tip: "Keep bait pinned firmly on riverbed in strong current seams" },
+      { name: "Feeder Hair Rig", setup: "Size 2/0 wide gap hook, method feeder filled with fishmeal paste + nightcrawler ball", tip: "Commonly used for lake sturgeon in calm basin waters" }
+    ]
+  },
+  {
+    name: "Carp",
+    color: "#ca8a04", // Bronze Gold
+    description: "Hard-fighting freshwater giant famous for intelligence, stamina, and subtle feeding. Highly prized target across rivers and lakes.",
+    season: "Spring through Autumn (May–October)",
+    habitat: "Quiet coves, slow river pools, shallow mud flats, weed edges",
+    subTypes: ["Common Carp", "Mirror Carp", "Grass Carp", "Bighead Carp", "Silver Carp"],
+    bestRigs: [
+      { name: "Hair Rig & Boilies", setup: "Size 6 curved shank hook, 15lb braided hooklink, 2oz inline lead, sweetcorn or pack bait on hair", tip: "Pre-bait the area with sweetcorn or pack bait; leave drag loose (baitrunner reel)" },
+      { name: "Method Feeder Rig", setup: "1oz method feeder packed with groundbait/corn, 4\" leader, size 8 hook with fake corn", tip: "Cast near weed edges or mud flats; leave rod in holder" },
+      { name: "Sight-Casting Crust Rig", setup: "Size 4 unweighted hook, piece of floating bread crust, 8lb fluorocarbon", tip: "Pitch to surface-feeding carp in shallow bays; let crust soak on surface" }
+    ]
+  },
+  {
+    name: "White Bass",
+    color: "#64748b", // Silver Slate
+    description: "Aggressive, fast-schooling temperate bass known for furious spring spawning runs in tributaries and surface feeding blitzes on main lake open water.",
+    season: "Spring spawning run (March–May), Summer surface blitzes",
+    habitat: "River tributaries, gravel bars, main lake points, open water humps",
+    subTypes: ["White Bass", "Wiper (Hybrid Striped Bass)"],
+    bestRigs: [
+      { name: "Inline Spinner / Curly Tail", setup: "1/8oz chartreuse/white inline spinner or 2\" curly tail swimbait on 1/8oz jig head", tip: "Cast across river riffles during spring runs; retrieve steadily through current seams" },
+      { name: "Topwater Popper", setup: "1/4oz Rebel Pop-R or Whopper Plopper 75, 8lb line", tip: "Cast into boiling surface schools at dawn; pop aggressively with short pauses" },
+      { name: "Spoon Jigging", setup: "1/2oz silver Kastmaster or Hopkins spoon, 6lb fluorocarbon", tip: "Vertical jigging over 15–25ft humps when fish stack up on sonar" }
     ]
   },
   {

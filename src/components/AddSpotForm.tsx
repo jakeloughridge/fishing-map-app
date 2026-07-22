@@ -158,41 +158,74 @@ export const AddSpotForm: React.FC<AddSpotFormProps> = ({ latLng, onSave, onCanc
             </span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-56 overflow-y-auto pr-1 p-1 bg-secondary/20 rounded-lg border border-border/50">
+          <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1 p-1.5 bg-secondary/20 rounded-lg border border-border/50">
             {SPECIES_DATA.map((species) => {
-              const isSelected = selectedSpecies.includes(species.name);
+              const isMainSelected = selectedSpecies.includes(species.name);
+              const hasSubTypes = Array.isArray(species.subTypes) && species.subTypes.length > 0;
+
               return (
-                <label
+                <div
                   key={species.name}
-                  className={`flex items-center justify-between p-2.5 rounded-md border cursor-pointer transition-all ${
-                    isSelected
-                      ? 'border-cyan-500/60 bg-cyan-500/15 text-foreground font-semibold shadow-xs'
-                      : 'border-border/60 bg-card/60 hover:bg-secondary/60 text-muted-foreground'
+                  className={`rounded-md border transition-all overflow-hidden ${
+                    isMainSelected
+                      ? 'border-cyan-500/60 bg-cyan-500/10'
+                      : 'border-border/60 bg-card/60 hover:bg-secondary/40'
                   }`}
                 >
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <div
-                      className="w-3 h-3 rounded-full shrink-0 shadow-xs"
-                      style={{ backgroundColor: species.color }}
-                    />
-                    <span className="text-xs truncate">{species.name}</span>
-                  </div>
-
-                  <input
-                    type="checkbox"
-                    className="sr-only"
-                    checked={isSelected}
-                    onChange={() => handleToggleSpecies(species.name)}
-                  />
-
-                  {isSelected ? (
-                    <div className="w-4 h-4 rounded-full bg-cyan-500 text-slate-950 flex items-center justify-center shrink-0">
-                      <Check className="w-3 h-3 stroke-[3]" />
+                  <label className="flex items-center justify-between p-2.5 cursor-pointer">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div
+                        className="w-3 h-3 rounded-full shrink-0 shadow-xs"
+                        style={{ backgroundColor: species.color }}
+                      />
+                      <span className="text-xs font-semibold text-foreground">{species.name}</span>
                     </div>
-                  ) : (
-                    <div className="w-4 h-4 rounded-full border border-border shrink-0" />
+
+                    <input
+                      type="checkbox"
+                      className="sr-only"
+                      checked={isMainSelected}
+                      onChange={() => handleToggleSpecies(species.name)}
+                    />
+
+                    {isMainSelected ? (
+                      <div className="w-4 h-4 rounded-full bg-cyan-500 text-slate-950 flex items-center justify-center shrink-0">
+                        <Check className="w-3 h-3 stroke-[3]" />
+                      </div>
+                    ) : (
+                      <div className="w-4 h-4 rounded-full border border-border shrink-0" />
+                    )}
+                  </label>
+
+                  {/* Sub-type Selection Choices */}
+                  {isMainSelected && hasSubTypes && (
+                    <div className="px-3 pb-3 pt-1 border-t border-cyan-500/20 bg-cyan-950/20 animate-in fade-in duration-200">
+                      <div className="text-[10px] font-bold uppercase tracking-wider text-cyan-400 mb-2">
+                        Select Specific Type(s) of {species.name}:
+                      </div>
+                      <div className="flex flex-wrap gap-1.5">
+                        {species.subTypes?.map((sub) => {
+                          const isSubSelected = selectedSpecies.includes(sub);
+                          return (
+                            <button
+                              type="button"
+                              key={sub}
+                              onClick={() => handleToggleSpecies(sub)}
+                              className={`text-[11px] px-2.5 py-1 rounded-full border transition-all flex items-center gap-1 font-medium ${
+                                isSubSelected
+                                  ? 'bg-cyan-500 text-slate-950 border-cyan-400 font-bold shadow-xs'
+                                  : 'bg-card/80 text-muted-foreground border-border hover:bg-secondary hover:text-foreground'
+                              }`}
+                            >
+                              <span>{sub}</span>
+                              {isSubSelected && <Check className="w-3 h-3 stroke-[3]" />}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
                   )}
-                </label>
+                </div>
               );
             })}
           </div>

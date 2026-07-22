@@ -66,33 +66,68 @@ export const LogCatchForm: React.FC<LogCatchFormProps> = ({ spot, onSave, onBack
             Species Caught
           </label>
           <div className="grid grid-cols-1 gap-2">
-            {SPECIES_DATA.map((s) => (
-              <label
-                key={s.name}
-                className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
-                  species === s.name
-                    ? 'border-primary bg-primary/10'
-                    : 'border-border bg-card hover:bg-secondary/40'
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="species"
-                  className="sr-only"
-                  value={s.name}
-                  checked={species === s.name}
-                  onChange={() => setSpecies(s.name)}
-                />
+            {SPECIES_DATA.map((s) => {
+              const isSelected = species === s.name || (s.subTypes && s.subTypes.includes(species));
+              const hasSubTypes = Array.isArray(s.subTypes) && s.subTypes.length > 0;
+
+              return (
                 <div
-                  className="w-3.5 h-3.5 rounded-full shrink-0"
-                  style={{ backgroundColor: s.color }}
-                />
-                <span className="font-medium text-sm text-foreground">{s.name}</span>
-                {!spot.species.includes(s.name) && (
-                  <span className="ml-auto text-xs text-muted-foreground italic">new to spot</span>
-                )}
-              </label>
-            ))}
+                  key={s.name}
+                  className={`rounded-lg border transition-all overflow-hidden ${
+                    isSelected
+                      ? 'border-primary bg-primary/10'
+                      : 'border-border bg-card hover:bg-secondary/40'
+                  }`}
+                >
+                  <label className="flex items-center gap-3 p-3 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="species"
+                      className="sr-only"
+                      value={s.name}
+                      checked={isSelected}
+                      onChange={() => setSpecies(s.name)}
+                    />
+                    <div
+                      className="w-3.5 h-3.5 rounded-full shrink-0"
+                      style={{ backgroundColor: s.color }}
+                    />
+                    <span className="font-medium text-sm text-foreground">{s.name}</span>
+                    {!spot.species.includes(s.name) && (
+                      <span className="ml-auto text-xs text-muted-foreground italic">new to spot</span>
+                    )}
+                  </label>
+
+                  {/* Sub-type choices if selected */}
+                  {isSelected && hasSubTypes && (
+                    <div className="px-3 pb-3 pt-1 border-t border-primary/20 bg-primary/5 animate-in fade-in duration-200">
+                      <div className="text-[10px] font-bold uppercase tracking-wider text-primary mb-2">
+                        Select Specific Type of {s.name}:
+                      </div>
+                      <div className="flex flex-wrap gap-1.5">
+                        {s.subTypes?.map((sub) => {
+                          const isSubSelected = species === sub;
+                          return (
+                            <button
+                              type="button"
+                              key={sub}
+                              onClick={() => setSpecies(sub)}
+                              className={`text-[11px] px-2.5 py-1 rounded-full border transition-all font-medium ${
+                                isSubSelected
+                                  ? 'bg-primary text-primary-foreground border-primary font-bold shadow-xs'
+                                  : 'bg-card text-muted-foreground border-border hover:bg-secondary hover:text-foreground'
+                              }`}
+                            >
+                              {sub}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
 
