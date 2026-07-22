@@ -500,18 +500,26 @@ const DEFAULT_SPOTS: FishingSpot[] = [
   },
 ];
 
+const CLOUD_SYNC_URL = 'https://api.restful-api.dev/objects/ff8081819f7e10ae019f8743c8530ec4';
+
+const syncChannel = typeof window !== 'undefined' && 'BroadcastChannel' in window
+  ? new BroadcastChannel('fishing_map_sync')
+  : null;
+
 export const getSpots = (): FishingSpot[] => {
   const stored = localStorage.getItem(STORAGE_KEY);
 
+  let userSpots: FishingSpot[] = [];
+
   if (stored) {
     const parsed = JSON.parse(stored) as FishingSpot[];
-    // Include both user-added spots and any custom pinned spots not in default list
-    const customSpots = parsed.filter(
-      (s) => s.isUserAdded || !DEFAULT_SPOTS.some((def) => def.id === s.id)
-    );
+    userSpots = parsed.filter((s) => s.isUserAdded);
+  }
 
-    // Merge system default spots with any stored overrides/catches
-    const defaultSpots = DEFAULT_SPOTS.map((def) => {
+  // Merge system default spots with stored overrides
+  const defaultSpots = DEFAULT_SPOTS.map((def) => {
+    if (stored) {
+      const parsed = JSON.parse(stored) as FishingSpot[];
       const storedMatch = parsed.find((s) => s.id === def.id);
       if (storedMatch) {
         return {
@@ -522,25 +530,88 @@ export const getSpots = (): FishingSpot[] => {
           pressureOverride: def.pressureOverride ?? storedMatch.pressureOverride,
         };
       }
-      return def;
-    });
+    }
+    return def;
+  });
 
-    const allSpots = [...defaultSpots, ...customSpots];
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(allSpots));
-    return allSpots;
-  }
+  // Deduplicate user spots
+  const spotMap = new Map<string, FishingSpot>();
+  userSpots.forEach((s) => spotMap.set(s.id, s));
 
-  // First load on this key — seed with defaults
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_SPOTS));
-  return DEFAULT_SPOTS;
+  const allSpots = [...defaultSpots, ...Array.from(spotMap.values())];
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(allSpots));
+  return allSpots;
 };
 
+// Async fetch community-pinned spots from global cloud storage
+export const fetchCommunitySpots = async (): Promise<FishingSpot[]> => {
+  try {
+    const res = await fetch(CLOUD_SYNC_URL);
+    if (!res.ok) return getSpots();
+
+    const data = await res.json();
+    const cloudSpots = (data?.data?.spots ?? []) as FishingSpot[];
+
+    if (!Array.isArray(cloudSpots) || cloudSpots.length === 0) {
+      return getSpots();
+    }
+
+    const currentSpots = getSpots();
+    const userSpots = currentSpots.filter((s) => s.isUserAdded);
+    
+    // Merge cloud spots with local user spots
+    const mergedMap = new Map<string, FishingSpot>();
+    userSpots.forEach((s) => mergedMap.set(s.id, s));
+    cloudSpots.forEach((s) => {
+      if (s.id && s.name && typeof s.lat === 'number' && typeof s.lng === 'number') {
+        mergedMap.set(s.id, { ...s, isUserAdded: true });
+      }
+    });
+
+    const defaultSpots = DEFAULT_SPOTS;
+    const allSpots = [...defaultSpots, ...Array.from(mergedMap.values())];
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(allSpots));
+    return allSpots;
+  } catch (err) {
+    console.warn('Unable to sync community spots from cloud:', err);
+    return getSpots();
+  }
+};
+
+// Push newly pinned water spot to global cloud store
 export const saveSpot = (spot: FishingSpot): void => {
-  const spots = getSpots();
-  spots.push(spot);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(spots));
+  const current = getSpots();
+  const exists = current.some((s) => s.id === spot.id);
+  const updated = exists ? current.map((s) => (s.id === spot.id ? spot : s)) : [...current, spot];
+
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+
+  if (syncChannel) {
+    syncChannel.postMessage({ type: 'SPOT_ADDED', spot });
+  }
+
+  // Push user-added spots to cloud store asynchronously
+  const userSpots = updated.filter((s) => s.isUserAdded);
+  fetch(CLOUD_SYNC_URL, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name: 'fishing_map_spots',
+      data: { spots: userSpots },
+    }),
+  }).catch((err) => console.warn('Failed to push spot to cloud store:', err));
 };
 
 export const saveAllSpots = (spots: FishingSpot[]): void => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(spots));
+  const userSpots = spots.filter((s) => s.isUserAdded);
+  fetch(CLOUD_SYNC_URL, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name: 'fishing_map_spots',
+      data: { spots: userSpots },
+    }),
+  }).catch((err) => console.warn('Failed to push spots to cloud store:', err));
 };

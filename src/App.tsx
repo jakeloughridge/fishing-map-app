@@ -35,6 +35,24 @@ function FishingMapApp() {
     document.documentElement.classList.add('dark');
     setSpots(getSpots());
     setCatches(getCatches());
+
+    // Sync community spots from global cloud store
+    import('@/data/spots').then(({ fetchCommunitySpots }) => {
+      fetchCommunitySpots().then((synced) => {
+        setSpots(synced);
+      });
+    });
+
+    // Poll for new community spots every 15 seconds
+    const syncInterval = setInterval(() => {
+      import('@/data/spots').then(({ fetchCommunitySpots }) => {
+        fetchCommunitySpots().then((synced) => {
+          setSpots(synced);
+        });
+      });
+    }, 15000);
+
+    return () => clearInterval(syncInterval);
   }, []);
 
   // Recompute heatmap pressure whenever spots change
@@ -65,8 +83,7 @@ function FishingMapApp() {
     saveSpot(newSpot);
     const updated = getSpots();
     setSpots(updated);
-    setSelectedSpot(newSpot);
-    setSidebarMode('spot');
+    setSidebarMode(null);
     setPendingLatLng(null);
   };
 
@@ -103,17 +120,18 @@ function FishingMapApp() {
 
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-background text-foreground font-sans">
+      <style>{`
+        .map-tiles {
+          filter: brightness(0.6) contrast(1.2) sepia(0.2) hue-rotate(180deg) saturate(0.8) invert(1);
+        }
+      `}</style>
 
       <Toolbar
         showMarkers={showMarkers}
         setShowMarkers={setShowMarkers}
         showHeatmap={showHeatmap}
         setShowHeatmap={setShowHeatmap}
-        addMode={addMode}
-        setAddMode={(val) => {
-          setAddMode(val);
-          if (val) closeSidebar();
-        }}
+        onPinAtCenter={() => handlePinDrop(39.5, -96.0)}
       />
 
       <MapView

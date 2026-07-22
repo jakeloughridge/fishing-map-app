@@ -26,7 +26,7 @@ interface MapViewProps {
   onMarkerClick: (spot: FishingSpot) => void;
 }
 
-const MapViewComponent: React.FC<MapViewProps> = ({
+export const MapView: React.FC<MapViewProps> = ({
   spots,
   heatmapData,
   showMarkers,
@@ -52,35 +52,11 @@ const MapViewComponent: React.FC<MapViewProps> = ({
       zoomControl: false,
     }).setView([39.5, -96.0], 4);
 
-    // Primary: Esri Dark Gray Canvas (native deep navy blue tiles, no CSS filter hack needed)
-    const primaryTiles = L.tileLayer(
-      'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
-      {
-        maxZoom: 16,
-        attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
-        keepBuffer: 10,
-        updateWhenIdle: false,
-        updateWhenZooming: true,
-      }
-    );
-
-    const fallbackTiles = L.tileLayer(
-      'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-      {
-        maxZoom: 19,
-        subdomains: 'abcd',
-        attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-        keepBuffer: 10,
-      }
-    );
-
-    primaryTiles.on('tileerror', () => {
-      if (!map.hasLayer(fallbackTiles)) {
-        fallbackTiles.addTo(map);
-      }
-    });
-
-    primaryTiles.addTo(map);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap contributors',
+      className: 'map-tiles',
+    }).addTo(map);
 
     L.control.zoom({ position: 'bottomleft' }).addTo(map);
 
@@ -114,38 +90,56 @@ const MapViewComponent: React.FC<MapViewProps> = ({
       iconAnchor: [22, 22],
     });
 
-    if (addMode || pendingLatLng) {
-      const initialPos: [number, number] = pendingLatLng
-        ? [pendingLatLng.lat, pendingLatLng.lng]
-        : [map.getCenter().lat, map.getCenter().lng];
+    const initialPos = pendingLatLng ? [pendingLatLng.lat, pendingLatLng.lng] : [39.5, -96.0];
 
-      if (!draggableMarkerRef.current) {
-        const marker = L.marker(initialPos, {
-          draggable: true,
-          icon: waterPinIcon,
-          zIndexOffset: 2000,
-        }).addTo(map);
+    if (!draggableMarkerRef.current) {
+      const marker = L.marker(initialPos as [number, number], {
+        draggable: true,
+        icon: waterPinIcon,
+        zIndexOffset: 2000,
+      }).addTo(map);
 
-        marker.on('dragend', (e) => {
-          const ll = e.target.getLatLng();
-          onPinDrop(ll.lat, ll.lng);
-        });
+      marker.on('dragend', (e) => {
+        const ll = e.target.getLatLng();
+        onPinDrop(ll.lat, ll.lng);
+      });
 
-        draggableMarkerRef.current = marker;
-      } else {
-        draggableMarkerRef.current.setLatLng(initialPos);
-        if (!map.hasLayer(draggableMarkerRef.current)) {
-          draggableMarkerRef.current.addTo(map);
-        }
-      }
+      draggableMarkerRef.current = marker;
     } else {
-      if (draggableMarkerRef.current && map.hasLayer(draggableMarkerRef.current)) {
-        map.removeLayer(draggableMarkerRef.current);
+      if (pendingLatLng) {
+        draggableMarkerRef.current.setLatLng([pendingLatLng.lat, pendingLatLng.lng]);
       }
     }
-  }, [addMode, pendingLatLng, onPinDrop]);
+  }, [pendingLatLng, onPinDrop]);
 
+  // Force Leaflet to recalculate viewport size whenever addMode or pendingLatLng changes
+  useEffect(() => {
+    if (!mapRef.current) return;
+    const timer = setTimeout(() => {
+      mapRef.current?.invalidateSize();
+    }, 150);
+    return () => clearTimeout(timer);
+  }, [addMode, pendingLatLng]);
 
+  // ResizeObserver on map container to continuously invalidate size on panel toggle
+  useEffect(() => {
+    if (!mapContainerRef.current || !mapRef.current) return;
+    const observer = new ResizeObserver(() => {
+      mapRef.current?.invalidateSize();
+    });
+    observer.observe(mapContainerRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  // Pan map when pendingLatLng changes
+  useEffect(() => {
+    if (mapRef.current && pendingLatLng) {
+      mapRef.current.flyTo([pendingLatLng.lat, pendingLatLng.lng], Math.max(mapRef.current.getZoom(), 8), {
+        duration: 1.2,
+      });
+      mapRef.current.invalidateSize();
+    }
+  }, [pendingLatLng]);
 
   // Map click handler — rebinds when addMode changes
   useEffect(() => {
@@ -215,7 +209,32 @@ const MapViewComponent: React.FC<MapViewProps> = ({
         inner.addTo(layer);
       });
     }
-  }, [spots, showMarkers, addMode, onMarkerClick]);
+
+    // Render temporary pin for pending water spot if present
+    if (pendingLatLng) {
+      const pendingOuter = L.circleMarker([pendingLatLng.lat, pendingLatLng.lng], {
+        radius: 20,
+        fillColor: '#06b6d4',
+        color: '#22d3ee',
+        weight: 2,
+        fillOpacity: 0.35,
+        interactive: false,
+      });
+
+      const pendingInner = L.circleMarker([pendingLatLng.lat, pendingLatLng.lng], {
+        radius: 10,
+        fillColor: '#0891b2',
+        color: '#ffffff',
+        weight: 3,
+        opacity: 1,
+        fillOpacity: 1,
+        interactive: false,
+      });
+
+      pendingOuter.addTo(layer);
+      pendingInner.addTo(layer);
+    }
+  }, [spots, showMarkers, addMode, pendingLatLng, onMarkerClick]);
 
   // Redraw heatmap whenever data or visibility changes
   useEffect(() => {
@@ -251,5 +270,3 @@ const MapViewComponent: React.FC<MapViewProps> = ({
     />
   );
 };
-
-export const MapView = React.memo(MapViewComponent);

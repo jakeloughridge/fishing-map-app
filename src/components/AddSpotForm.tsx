@@ -56,14 +56,14 @@ export const AddSpotForm: React.FC<AddSpotFormProps> = ({ latLng, onSave, onCanc
     if (!name.trim()) return;
 
     const newSpot: FishingSpot = {
-      id: `spot-water-${Date.now()}`,
+      id: `spot-${Date.now()}`,
       name: name.trim(),
       lat: latLng.lat,
       lng: latLng.lng,
       species: selectedSpecies,
       notes: notes.trim(),
       dateAdded: new Date().toISOString(),
-      isUserAdded: false,
+      isUserAdded: true,
       accessDifficulty,
     };
 
