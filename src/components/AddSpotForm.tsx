@@ -70,9 +70,36 @@ export const AddSpotForm: React.FC<AddSpotFormProps> = ({ latLng, onSave, onCanc
   }, [latLng]);
 
   const handleToggleSpecies = (speciesName: string) => {
-    setSelectedSpecies((prev) =>
-      prev.includes(speciesName) ? prev.filter((s) => s !== speciesName) : [...prev, speciesName]
-    );
+    setSelectedSpecies((prev) => {
+      // If toggling a main species that has sub-types
+      const mainSpeciesObj = SPECIES_DATA.find((s) => s.name === speciesName);
+      if (mainSpeciesObj && mainSpeciesObj.subTypes) {
+        if (prev.includes(speciesName)) {
+          // Turning OFF main species — remove main species AND all its sub-types
+          const subTypes = mainSpeciesObj.subTypes;
+          return prev.filter((s) => s !== speciesName && !subTypes.includes(s));
+        } else {
+          // Turning ON main species
+          return [...prev, speciesName];
+        }
+      }
+
+      // Check if toggling a sub-type (e.g. "Common Carp")
+      const parentSpeciesObj = SPECIES_DATA.find((s) => s.subTypes?.includes(speciesName));
+      if (parentSpeciesObj) {
+        if (prev.includes(speciesName)) {
+          // Turning OFF a sub-type
+          return prev.filter((s) => s !== speciesName);
+        } else {
+          // Turning ON a sub-type — ensure parent species is also selected
+          const withParent = prev.includes(parentSpeciesObj.name) ? prev : [...prev, parentSpeciesObj.name];
+          return [...withParent, speciesName];
+        }
+      }
+
+      // Standard species toggle
+      return prev.includes(speciesName) ? prev.filter((s) => s !== speciesName) : [...prev, speciesName];
+    });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -158,7 +185,7 @@ export const AddSpotForm: React.FC<AddSpotFormProps> = ({ latLng, onSave, onCanc
             </span>
           </div>
 
-          <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1 p-1.5 bg-secondary/20 rounded-lg border border-border/50">
+          <div className="space-y-2 max-h-64 overflow-y-auto pr-1 p-1 bg-secondary/20 rounded-lg border border-border/50">
             {SPECIES_DATA.map((species) => {
               const isMainSelected = selectedSpecies.includes(species.name);
               const hasSubTypes = Array.isArray(species.subTypes) && species.subTypes.length > 0;
@@ -172,7 +199,11 @@ export const AddSpotForm: React.FC<AddSpotFormProps> = ({ latLng, onSave, onCanc
                       : 'border-border/60 bg-card/60 hover:bg-secondary/40'
                   }`}
                 >
-                  <label className="flex items-center justify-between p-2.5 cursor-pointer">
+                  <button
+                    type="button"
+                    onClick={() => handleToggleSpecies(species.name)}
+                    className="w-full flex items-center justify-between p-2.5 text-left cursor-pointer transition-colors hover:bg-cyan-500/5 select-none"
+                  >
                     <div className="flex items-center gap-2.5 min-w-0">
                       <div
                         className="w-3 h-3 rounded-full shrink-0 shadow-xs"
@@ -181,13 +212,6 @@ export const AddSpotForm: React.FC<AddSpotFormProps> = ({ latLng, onSave, onCanc
                       <span className="text-xs font-semibold text-foreground">{species.name}</span>
                     </div>
 
-                    <input
-                      type="checkbox"
-                      className="sr-only"
-                      checked={isMainSelected}
-                      onChange={() => handleToggleSpecies(species.name)}
-                    />
-
                     {isMainSelected ? (
                       <div className="w-4 h-4 rounded-full bg-cyan-500 text-slate-950 flex items-center justify-center shrink-0">
                         <Check className="w-3 h-3 stroke-[3]" />
@@ -195,11 +219,11 @@ export const AddSpotForm: React.FC<AddSpotFormProps> = ({ latLng, onSave, onCanc
                     ) : (
                       <div className="w-4 h-4 rounded-full border border-border shrink-0" />
                     )}
-                  </label>
+                  </button>
 
                   {/* Sub-type Selection Choices */}
                   {isMainSelected && hasSubTypes && (
-                    <div className="px-3 pb-3 pt-1 border-t border-cyan-500/20 bg-cyan-950/20 animate-in fade-in duration-200">
+                    <div className="px-3 pb-3 pt-1 border-t border-cyan-500/20 bg-cyan-950/30 animate-in fade-in duration-200">
                       <div className="text-[10px] font-bold uppercase tracking-wider text-cyan-400 mb-2">
                         Select Specific Type(s) of {species.name}:
                       </div>
@@ -210,11 +234,14 @@ export const AddSpotForm: React.FC<AddSpotFormProps> = ({ latLng, onSave, onCanc
                             <button
                               type="button"
                               key={sub}
-                              onClick={() => handleToggleSpecies(sub)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleToggleSpecies(sub);
+                              }}
                               className={`text-[11px] px-2.5 py-1 rounded-full border transition-all flex items-center gap-1 font-medium ${
                                 isSubSelected
                                   ? 'bg-cyan-500 text-slate-950 border-cyan-400 font-bold shadow-xs'
-                                  : 'bg-card/80 text-muted-foreground border-border hover:bg-secondary hover:text-foreground'
+                                  : 'bg-card/90 text-muted-foreground border-border hover:bg-secondary hover:text-foreground'
                               }`}
                             >
                               <span>{sub}</span>
