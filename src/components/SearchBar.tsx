@@ -132,9 +132,53 @@ export const SearchBar: React.FC<SearchBarProps> = ({
     setQuery('');
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!query.trim()) return;
+
+    // 1. If there's a top matching spot, select it!
+    if (matchingSpots.length > 0 && matchingSpots[0].type === 'spot') {
+      handleSelectSpotItem(matchingSpots[0].spot);
+      return;
+    }
+
+    // 2. If there's a matching species, select its spot!
+    if (matchingSpecies.length > 0 && matchingSpecies[0].type === 'species') {
+      handleSelectSpotItem(matchingSpecies[0].sampleSpot);
+      return;
+    }
+
+    // 3. If there are geocoded items already loaded, fly to top result!
+    if (geoItems.length > 0 && geoItems[0].type === 'geo') {
+      handleSelectGeoItem(geoItems[0].lat, geoItems[0].lng);
+      return;
+    }
+
+    // 4. Otherwise, perform instant geocoding lookup on Enter
+    try {
+      setIsGeocoding(true);
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query.trim())}&limit=1`
+      );
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          const lat = parseFloat(data[0].lat);
+          const lng = parseFloat(data[0].lon);
+          handleSelectGeoItem(lat, lng);
+          return;
+        }
+      }
+    } catch (err) {
+      console.warn('OnEnter geocoding error:', err);
+    } finally {
+      setIsGeocoding(false);
+    }
+  };
+
   return (
     <div ref={containerRef} className="relative w-full max-w-sm sm:max-w-md">
-      <div className="relative flex items-center">
+      <form onSubmit={handleSubmit} className="relative flex items-center">
         <Search className="absolute left-3.5 w-4 h-4 text-cyan-400 shrink-0 pointer-events-none" />
         <input
           type="text"
@@ -149,11 +193,12 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         />
         {query ? (
           <button
+            type="button"
             onClick={() => {
               setQuery('');
               setIsOpen(false);
             }}
-            className="absolute right-3 text-muted-foreground hover:text-foreground"
+            className="absolute right-3 text-muted-foreground hover:text-foreground cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -162,7 +207,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
             <Loader2 className="absolute right-3 w-4 h-4 text-cyan-400 animate-spin" />
           )
         )}
-      </div>
+      </form>
 
       {/* Search Results Dropdown */}
       {isOpen && query.trim() && (
