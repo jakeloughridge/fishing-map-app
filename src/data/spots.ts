@@ -97,6 +97,17 @@ const DEFAULT_SPOTS: FishingSpot[] = [
     isUserAdded: false,
     accessDifficulty: 'easy',
   },
+  {
+    id: 'spot-pnw-3',
+    name: 'Middle Fork Snoqualmie River — North Bend, WA',
+    lat: 47.4950,
+    lng: -121.7850,
+    species: ['Cutthroat Trout', 'Rainbow Trout', 'Mountain Whitefish', 'Bull Trout'],
+    notes: 'Scenic Cascade mountain freestone river near North Bend. Native Coastal Cutthroat, wild Rainbow Trout, Mountain Whitefish, and protected Bull Trout hold in deep gravel pools, pocket water, and boulder runs.',
+    dateAdded: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    isUserAdded: false,
+    accessDifficulty: 'easy',
+  },
 
   // ── Boise & Boise National Forest ─────────────────────────────────────────
   {
@@ -619,37 +630,68 @@ const syncChannel = typeof window !== 'undefined' && 'BroadcastChannel' in windo
   ? new BroadcastChannel('fishing_map_sync')
   : null;
 
-export const getSpots = (): FishingSpot[] => {
-  const stored = localStorage.getItem(STORAGE_KEY);
+// Helper to harvest user-added spots across all current and legacy localStorage keys
+export const getAllLocalUserSpots = (): FishingSpot[] => {
+  if (typeof window === 'undefined') return [];
+  const userSpotsMap = new Map<string, FishingSpot>();
 
-  let userSpots: FishingSpot[] = [];
-
-  if (stored) {
-    const parsed = JSON.parse(stored) as FishingSpot[];
-    userSpots = parsed.filter((s) => s.isUserAdded);
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && (key.startsWith('fishing_spots') || key.startsWith('fish_mapper'))) {
+        const val = localStorage.getItem(key);
+        if (val) {
+          try {
+            const parsed = JSON.parse(val);
+            if (Array.isArray(parsed)) {
+              parsed.forEach((s: FishingSpot) => {
+                if (s && s.isUserAdded && s.id && s.name && typeof s.lat === 'number' && typeof s.lng === 'number') {
+                  userSpotsMap.set(s.id, s);
+                }
+              });
+            }
+          } catch {
+            // Ignore unparseable JSON
+          }
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('Error harvesting local user spots:', err);
   }
+
+  return Array.from(userSpotsMap.values());
+};
+
+export const getSpots = (): FishingSpot[] => {
+  const localUserSpots = getAllLocalUserSpots();
+  const stored = localStorage.getItem(STORAGE_KEY);
 
   // Merge system default spots with stored overrides
   const defaultSpots = DEFAULT_SPOTS.map((def) => {
     if (stored) {
-      const parsed = JSON.parse(stored) as FishingSpot[];
-      const storedMatch = parsed.find((s) => s.id === def.id);
-      if (storedMatch) {
-        return {
-          ...def,
-          species: storedMatch.species && storedMatch.species.length > 0 ? storedMatch.species : def.species,
-          notes: storedMatch.notes || def.notes,
-          accessDifficulty: (storedMatch.accessDifficulty ?? def.accessDifficulty) as AccessDifficulty,
-          pressureOverride: def.pressureOverride ?? storedMatch.pressureOverride,
-        };
+      try {
+        const parsed = JSON.parse(stored) as FishingSpot[];
+        const storedMatch = parsed.find((s) => s.id === def.id);
+        if (storedMatch) {
+          return {
+            ...def,
+            species: storedMatch.species && storedMatch.species.length > 0 ? storedMatch.species : def.species,
+            notes: storedMatch.notes || def.notes,
+            accessDifficulty: (storedMatch.accessDifficulty ?? def.accessDifficulty) as AccessDifficulty,
+            pressureOverride: def.pressureOverride ?? storedMatch.pressureOverride,
+          };
+        }
+      } catch {
+        // Ignore
       }
     }
     return def;
   });
 
-  // Deduplicate user spots
+  // Deduplicate user spots harvested from local storage
   const spotMap = new Map<string, FishingSpot>();
-  userSpots.forEach((s) => spotMap.set(s.id, s));
+  localUserSpots.forEach((s) => spotMap.set(s.id, s));
 
   const allSpots = [...defaultSpots, ...Array.from(spotMap.values())];
   localStorage.setItem(STORAGE_KEY, JSON.stringify(allSpots));
@@ -680,24 +722,36 @@ export const fetchCommunitySpots = async (): Promise<FishingSpot[]> => {
     const data = await res.json();
     const cloudSpots = (Array.isArray(data?.spots) ? data.spots : Array.isArray(data?.data?.spots) ? data.data.spots : []) as FishingSpot[];
 
-    if (!Array.isArray(cloudSpots) || cloudSpots.length === 0) {
-      return getSpots();
-    }
-
-    const currentSpots = getSpots();
-    const userSpots = currentSpots.filter((s) => s.isUserAdded);
+    const localUserSpots = getAllLocalUserSpots();
     
     // Merge cloud spots with local user spots
     const mergedMap = new Map<string, FishingSpot>();
-    userSpots.forEach((s) => mergedMap.set(s.id, s));
-    cloudSpots.forEach((s) => {
-      if (s.id && s.name && typeof s.lat === 'number' && typeof s.lng === 'number') {
-        mergedMap.set(s.id, { ...s, isUserAdded: true });
-      }
-    });
+    localUserSpots.forEach((s) => mergedMap.set(s.id, s));
+    if (Array.isArray(cloudSpots)) {
+      cloudSpots.forEach((s) => {
+        if (s.id && s.name && typeof s.lat === 'number' && typeof s.lng === 'number') {
+          mergedMap.set(s.id, { ...s, isUserAdded: true });
+        }
+      });
+    }
+
+    const mergedUserSpots = Array.from(mergedMap.values());
+
+    // Auto-upload any local user spots that are missing from cloud storage
+    const missingInCloud = localUserSpots.filter((localSpot) => !cloudSpots.some((cs) => cs.id === localSpot.id));
+    if (missingInCloud.length > 0) {
+      fetch(CLOUD_SYNC_URL, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({
+          name: 'fishing_map_spots',
+          spots: mergedUserSpots,
+        }),
+      }).catch((err) => console.warn('Background upload of missing local user spots failed:', err));
+    }
 
     const defaultSpots = DEFAULT_SPOTS;
-    const allSpots = [...defaultSpots, ...Array.from(mergedMap.values())];
+    const allSpots = [...defaultSpots, ...mergedUserSpots];
 
     localStorage.setItem(STORAGE_KEY, JSON.stringify(allSpots));
     return allSpots;
@@ -709,11 +763,14 @@ export const fetchCommunitySpots = async (): Promise<FishingSpot[]> => {
 
 // Push newly pinned water spot to global cloud store with atomic cloud merging
 export const saveSpot = async (spot: FishingSpot): Promise<void> => {
-  const current = getSpots();
-  const exists = current.some((s) => s.id === spot.id);
-  const updated = exists ? current.map((s) => (s.id === spot.id ? spot : s)) : [...current, spot];
+  const localUserSpots = getAllLocalUserSpots();
+  const exists = localUserSpots.some((s) => s.id === spot.id);
+  const updatedUserSpots = exists
+    ? localUserSpots.map((s) => (s.id === spot.id ? spot : s))
+    : [...localUserSpots, { ...spot, isUserAdded: true }];
 
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+  const allSpots = [...DEFAULT_SPOTS, ...updatedUserSpots];
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(allSpots));
 
   if (syncChannel) {
     syncChannel.postMessage({ type: 'SPOT_ADDED', spot });
@@ -735,8 +792,9 @@ export const saveSpot = async (spot: FishingSpot): Promise<void> => {
       });
     }
 
-    // Add or update the new spot
-    mergedMap.set(spot.id, { ...spot, isUserAdded: true });
+    updatedUserSpots.forEach((s) => {
+      mergedMap.set(s.id, { ...s, isUserAdded: true });
+    });
 
     const mergedUserSpots = Array.from(mergedMap.values());
 
