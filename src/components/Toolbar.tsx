@@ -9,6 +9,7 @@ interface ToolbarProps {
   onPinAtCenter?: () => void;
   onOpenForum?: () => void;
   onSyncSpots?: () => void;
+  searchBarNode?: React.ReactNode;
 }
 
 export const Toolbar: React.FC<ToolbarProps> = ({
@@ -19,6 +20,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   onPinAtCenter,
   onOpenForum,
   onSyncSpots,
+  searchBarNode,
 }) => {
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncSuccess, setSyncSuccess] = useState(false);
@@ -48,6 +50,12 @@ export const Toolbar: React.FC<ToolbarProps> = ({
             FishMapper
           </h1>
         </div>
+
+        {searchBarNode && (
+          <div className="shrink-0 min-w-[200px] sm:min-w-[320px]">
+            {searchBarNode}
+          </div>
+        )}
 
         <div className="flex items-center gap-2 shrink-0">
           <button

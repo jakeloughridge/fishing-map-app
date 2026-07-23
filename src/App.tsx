@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import { MapView } from '@/components/MapView';
 import { Toolbar } from '@/components/Toolbar';
+import { SearchBar } from '@/components/SearchBar';
 import { Sidebar } from '@/components/Sidebar';
 import { SpotDetail } from '@/components/SpotDetail';
 import { AddSpotForm } from '@/components/AddSpotForm';
@@ -25,6 +26,7 @@ function FishingMapApp() {
   const [catches, setCatches] = useState<CatchLog[]>([]);
   const [selectedSpot, setSelectedSpot] = useState<FishingSpot | null>(null);
   const [sidebarMode, setSidebarMode] = useState<SidebarMode>(null);
+  const [focusTarget, setFocusTarget] = useState<{ lat: number; lng: number; zoom?: number } | null>(null);
 
   const [showMarkers, setShowMarkers] = useState(true);
   const [showHeatmap, setShowHeatmap] = useState(false);
@@ -140,6 +142,18 @@ function FishingMapApp() {
         onPinAtCenter={() => handlePinDrop(39.5, -96.0)}
         onOpenForum={() => setSidebarMode('forum')}
         onSyncSpots={handleSyncSpots}
+        searchBarNode={
+          <SearchBar
+            spots={spots}
+            onSelectSpot={(spot) => {
+              setSelectedSpot(spot);
+              setSidebarMode('spot');
+            }}
+            onSelectLocation={(lat, lng, zoom) => {
+              setFocusTarget({ lat, lng, zoom: zoom ?? 11 });
+            }}
+          />
+        }
       />
 
       <MapView
@@ -149,6 +163,7 @@ function FishingMapApp() {
         showHeatmap={showHeatmap}
         addMode={addMode}
         pendingLatLng={pendingLatLng}
+        focusTarget={focusTarget}
         onMapClick={handleMapClick}
         onPinDrop={handlePinDrop}
         onMarkerClick={handleMarkerClick}

@@ -21,6 +21,7 @@ interface MapViewProps {
   showHeatmap: boolean;
   addMode: boolean;
   pendingLatLng?: { lat: number; lng: number } | null;
+  focusTarget?: { lat: number; lng: number; zoom?: number } | null;
   onMapClick: (lat: number, lng: number) => void;
   onPinDrop: (lat: number, lng: number) => void;
   onMarkerClick: (spot: FishingSpot) => void;
@@ -33,6 +34,7 @@ export const MapView: React.FC<MapViewProps> = ({
   showHeatmap,
   addMode,
   pendingLatLng,
+  focusTarget,
   onMapClick,
   onPinDrop,
   onMarkerClick,
@@ -43,6 +45,15 @@ export const MapView: React.FC<MapViewProps> = ({
   const markersLayerRef = useRef<L.LayerGroup | null>(null);
   const heatmapLayerRef = useRef<L.LayerGroup | null>(null);
   const draggableMarkerRef = useRef<L.Marker | null>(null);
+
+  // Smoothly fly map to focus target when search item selected
+  useEffect(() => {
+    if (mapRef.current && focusTarget) {
+      mapRef.current.flyTo([focusTarget.lat, focusTarget.lng], focusTarget.zoom ?? 11, {
+        duration: 1.5,
+      });
+    }
+  }, [focusTarget]);
 
   // Initialize Map once
   useEffect(() => {
