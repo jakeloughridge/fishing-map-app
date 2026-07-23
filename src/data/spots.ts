@@ -14,7 +14,7 @@ export type FishingSpot = {
 };
 
 // Changing this key forces all browsers to start fresh (old key is simply abandoned)
-const STORAGE_KEY = 'fishing_spots_v32';
+const STORAGE_KEY = 'fishing_spots_v33';
 
 // Spots spread across the continental US & Canada
 const DEFAULT_SPOTS: FishingSpot[] = [
@@ -550,6 +550,63 @@ const DEFAULT_SPOTS: FishingSpot[] = [
     lng: -107.03,
     species: ['Rainbow Trout', 'Brown Trout', 'Mountain Whitefish', 'Cutthroat Trout'],
     notes: 'Iconic Gold Medal trout stream flowing through the Roaring Fork Valley. Famous for legendary Green Drake hatches in July, prolific Mother\'s Day caddis hatches, and year-round technical nymphing for wild trophy Brown Trout, Rainbow Trout, and Mountain Whitefish.',
+    dateAdded: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    isUserAdded: false,
+    accessDifficulty: 'easy',
+  },
+
+  // ── Midwest Heartland Premier Waters (SD, NE, KS, IA, IN) ───────────────────
+  {
+    id: 'spot-sd-1',
+    name: 'Lake Oahe — Pierre & Cow Creek, SD',
+    lat: 44.5200,
+    lng: -100.4100,
+    species: ['Walleye', 'Smallmouth Bass', 'Northern Pike', 'Catfish', 'Yellow Perch'],
+    notes: 'Massive Missouri River reservoir renowned nationwide for world-class Walleye, trophy Smallmouth Bass, Northern Pike, Channel Catfish, and stocked Chinook Salmon.',
+    dateAdded: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    isUserAdded: false,
+    accessDifficulty: 'easy',
+  },
+  {
+    id: 'spot-ne-1',
+    name: 'Lake McConaughy — Kingsley Dam & Martin Bay, NE',
+    lat: 41.2200,
+    lng: -101.6700,
+    species: ['Walleye', 'Smallmouth Bass', 'Striped Bass', 'Northern Pike', 'Catfish', 'Crappie'],
+    notes: 'Nebraska\'s largest reservoir (\'Lake Mac\'). Famous white sand beaches holding monster trophy Walleye, Wiper (Striped Bass hybrids), Smallmouth Bass, and Northern Pike.',
+    dateAdded: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    isUserAdded: false,
+    accessDifficulty: 'easy',
+  },
+  {
+    id: 'spot-ks-1',
+    name: 'Milford Lake — Flagstop & Causeways, KS',
+    lat: 39.1800,
+    lng: -96.9500,
+    species: ['Catfish', 'Walleye', 'Smallmouth Bass', 'Largemouth Bass', 'Crappie', 'Gar'],
+    notes: 'Kansas\'s largest lake and official \'Fishing Capital of Kansas\'. World-record Blue Catfish producer (102lb record!), trophy Channel & Flathead Catfish, Alligator/Longnose Gar, Walleye, and Smallmouth Bass.',
+    dateAdded: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    isUserAdded: false,
+    accessDifficulty: 'easy',
+  },
+  {
+    id: 'spot-ia-1',
+    name: 'Clear Lake — Island Park & Reefs, IA',
+    lat: 43.1350,
+    lng: -93.3800,
+    species: ['Walleye', 'Muskellunge', 'Channel Catfish', 'Crappie', 'Bluegill'],
+    notes: 'Iowa\'s premier natural glacial lake fishery. Nationally renowned for high-density Walleye runs, trophy Muskellunge (Musky), heavy Yellow Bass blitzes, and slab Crappie.',
+    dateAdded: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    isUserAdded: false,
+    accessDifficulty: 'easy',
+  },
+  {
+    id: 'spot-in-1',
+    name: 'Lake Monroe — Cutright & Causeway, IN',
+    lat: 39.0800,
+    lng: -86.4200,
+    species: ['Largemouth Bass', 'Crappie', 'Catfish', 'Walleye', 'Bluegill'],
+    notes: 'Indiana\'s largest inland lake surrounded by Hoosier National Forest. Legendary slab Crappie factory, heavy Largemouth Bass in flooded timber, and trophy Hybrid Striped Bass (Wiper).',
     dateAdded: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
     isUserAdded: false,
     accessDifficulty: 'easy',
