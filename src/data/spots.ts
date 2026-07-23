@@ -14,7 +14,7 @@ export type FishingSpot = {
 };
 
 // Changing this key forces all browsers to start fresh (old key is simply abandoned)
-const STORAGE_KEY = 'fishing_spots_v31';
+const STORAGE_KEY = 'fishing_spots_v32';
 
 // Spots spread across the continental US & Canada
 const DEFAULT_SPOTS: FishingSpot[] = [
@@ -46,8 +46,8 @@ const DEFAULT_SPOTS: FishingSpot[] = [
     name: 'Lake Erie — Buffalo Harbor & Outer Breakwalls, NY',
     lat: 42.8715,
     lng: -78.8955,
-    species: ['Smallmouth Bass', 'Walleye', 'Lake Trout', 'Yellow Perch', 'Sturgeon', 'Carp'],
-    notes: 'Ranked as one of America\'s #1 Smallmouth Bass fisheries. Monster bronze-backs, deep Lake Trout, trophy Walleye, Yellow Perch, and Carp thrive along the harbor breakwalls and rock reefs.',
+    species: ['Smallmouth Bass', 'Walleye', 'Lake Trout', 'Gar', 'Yellow Perch', 'Sturgeon', 'Carp'],
+    notes: 'Ranked as one of America\'s #1 Smallmouth Bass fisheries. Monster bronze-backs, deep Lake Trout, trophy Walleye, Longnose Gar, Yellow Perch, and Carp thrive along the harbor breakwalls and rock reefs.',
     dateAdded: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
     isUserAdded: false,
     accessDifficulty: 'easy',
@@ -57,8 +57,8 @@ const DEFAULT_SPOTS: FishingSpot[] = [
     name: 'Lake Champlain — Ticonderoga & South Bay, NY',
     lat: 43.8475,
     lng: -73.3980,
-    species: ['Largemouth Bass', 'Smallmouth Bass', 'Lake Trout', 'Northern Pike', 'Crappie', 'Bluegill', 'Walleye'],
-    notes: 'Nationally renowned bass and lake trout tournament destination. Deep coldwater basins hold wild Lake Trout, while lush shallow weed beds hold heavy Largemouth Bass and Northern Pike.',
+    species: ['Largemouth Bass', 'Smallmouth Bass', 'Lake Trout', 'Gar', 'Northern Pike', 'Crappie', 'Bluegill', 'Walleye'],
+    notes: 'Nationally renowned bass and lake trout tournament destination. Deep coldwater basins hold wild Lake Trout, while lush shallow weed beds hold heavy Largemouth Bass, Longnose Gar, and Northern Pike.',
     dateAdded: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
     isUserAdded: false,
     accessDifficulty: 'easy',
@@ -68,8 +68,8 @@ const DEFAULT_SPOTS: FishingSpot[] = [
     name: 'Oneida Lake — Sylvan Beach & Shoal Reefs, NY',
     lat: 43.1812,
     lng: -75.9870,
-    species: ['Walleye', 'Yellow Perch', 'Smallmouth Bass', 'Largemouth Bass', 'Carp', 'Catfish'],
-    notes: 'New York\'s premier Walleye factory. Shallow natural lake with extensive shoal reefs holding massive schools of Walleye, Yellow Perch, Smallmouth Bass, and Carp.',
+    species: ['Walleye', 'Yellow Perch', 'Smallmouth Bass', 'Largemouth Bass', 'Gar', 'Carp', 'Catfish'],
+    notes: 'New York\'s premier Walleye factory. Shallow natural lake with extensive shoal reefs holding massive schools of Walleye, Longnose Gar, Yellow Perch, Smallmouth Bass, and Carp.',
     dateAdded: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
     isUserAdded: false,
     accessDifficulty: 'easy',
@@ -478,8 +478,8 @@ const DEFAULT_SPOTS: FishingSpot[] = [
     name: 'Lake Guntersville — Waterfront Park, AL',
     lat: 34.36,
     lng: -86.29,
-    species: ['Largemouth Bass', 'Smallmouth Bass', 'Crappie', 'Bluegill', 'Catfish'],
-    notes: 'Alabama\'s largest lake and a premier legendary TVA bass fishery. Famous for vast hydrilla and eelgrass beds, ledge fishing for largemouth and smallmouth bass along the Tennessee River channel, trophy slab crappie along causeways, and heavy bluegill in shallow grass.',
+    species: ['Largemouth Bass', 'Smallmouth Bass', 'Gar', 'Crappie', 'Bluegill', 'Catfish'],
+    notes: 'Alabama\'s largest lake and a premier legendary TVA bass fishery. Famous for vast hydrilla and eelgrass beds, Alligator & Longnose Gar, ledge fishing along the Tennessee River channel, and heavy bluegill in shallow grass.',
     dateAdded: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
     isUserAdded: false,
     accessDifficulty: 'easy',
@@ -491,8 +491,8 @@ const DEFAULT_SPOTS: FishingSpot[] = [
     name: 'Clear Lake — Lucerne Harbor, CA',
     lat: 39.09,
     lng: -122.78,
-    species: ['Largemouth Bass', 'Catfish', 'Crappie', 'Bluegill'],
-    notes: 'Natural freshwater lake in Northern California widely considered the #1 largemouth bass fishery in the West. Famous for double-digit trophy Florida-strain bass feeding on hitch shad, heavy tule reed beds, dock flipping, and spring slab crappie.',
+    species: ['Largemouth Bass', 'Gar', 'Catfish', 'Crappie', 'Bluegill'],
+    notes: 'Natural freshwater lake in Northern California widely considered the #1 largemouth bass fishery in the West. Famous for double-digit trophy Florida-strain bass, Longnose Gar, heavy tule reed beds, dock flipping, and spring slab crappie.',
     dateAdded: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
     isUserAdded: false,
     accessDifficulty: 'easy',

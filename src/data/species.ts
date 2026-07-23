@@ -468,5 +468,18 @@ export const SPECIES_DATA: FishSpecies[] = [
       { name: "Indicator Double Nymph", setup: "Size 14 Copper John + Size 18 Chironomid under micro float", tip: "Adjust depth so bottom nymph ticks rocks every 4–5 feet" },
       { name: "Small Inline Spinner", setup: "Panther Martin 1/16oz gold blade, 4lb mono", tip: "Cast across current and slow-roll near bottom in deep runs" }
     ]
+  },
+  {
+    name: "Gar",
+    color: "#78350f", // Armor Bronze / Olive Amber
+    description: "Prehistoric armor-scaled apex predator with sharp needle teeth. Thrives in warm rivers, backwaters, bayous, and lakes; famous for gulping air at the surface and thrilling fights.",
+    subTypes: ["Alligator Gar", "Longnose Gar", "Shortnose Gar", "Spotted Gar", "Florida Gar"],
+    season: "Late Spring through Autumn (May–October)",
+    habitat: "River backwaters, bayous, sluggish warm rivers, shallow lake coves, weed edges",
+    bestRigs: [
+      { name: "Frayed Nylon Rope Lure", setup: "4\" unweighted frayed white nylon rope lure (no hooks required)", tip: "Cast near surface rolls; Gar's needle teeth entangle securely in nylon fibers on the strike" },
+      { name: "Live Cut Bait & Steel Leader", setup: "5/0 circle hook, 50lb steel wire leader, 2oz heavy slip float, 4\" fresh cut shad or mullet", tip: "Set float 2–4ft deep near backwater logjams; give gar 10 seconds to turn bait before setting hook" },
+      { name: "Topwater Walking Plug", setup: "Rapala Skitter Walk or Heddon Zara Spook in bone/silver, 30lb fluorocarbon", tip: "Twitch slow along calm river coves at dusk — explosive topwater strikes" }
+    ]
   }
 ];
