@@ -12,7 +12,7 @@ import { LogCatchForm } from '@/components/LogCatchForm';
 import { CommunityForum } from '@/components/CommunityForum';
 import { HeatmapLegend } from '@/components/HeatmapLegend';
 
-import { getSpots, saveSpot, updateSpotSpecies, fetchCommunitySpots, FishingSpot } from '@/data/spots';
+import { getSpots, saveSpot, updateSpotSpecies, updateSpotDetails, deleteSpot, fetchCommunitySpots, FishingSpot } from '@/data/spots';
 import { getCatches, logCatch, CatchLog } from '@/data/catches';
 import { computePressurePoints } from '@/data/heatmap';
 
@@ -92,6 +92,21 @@ function FishingMapApp() {
     }
   };
 
+  const handleUpdateSpotDetails = async (spotId: string, updates: Partial<FishingSpot>) => {
+    const updated = await updateSpotDetails(spotId, updates);
+    setSpots(updated);
+    if (selectedSpot && selectedSpot.id === spotId) {
+      setSelectedSpot({ ...selectedSpot, ...updates });
+    }
+  };
+
+  const handleDeleteSpot = async (spotId: string) => {
+    const updated = await deleteSpot(spotId);
+    setSpots(updated);
+    setSidebarMode(null);
+    setSelectedSpot(null);
+  };
+
   const handleLogCatch = (entry: CatchLog) => {
     logCatch(entry);
     setCatches(getCatches());
@@ -148,6 +163,8 @@ function FishingMapApp() {
             catches={catches}
             onLogCatch={() => setSidebarMode('logCatch')}
             onUpdateSpecies={handleUpdateSpotSpecies}
+            onUpdateSpotDetails={handleUpdateSpotDetails}
+            onDeleteSpot={handleDeleteSpot}
           />
         )}
         {sidebarMode === 'logCatch' && selectedSpot && (

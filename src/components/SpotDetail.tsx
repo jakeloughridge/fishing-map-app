@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FishingSpot } from '@/data/spots';
+import { FishingSpot, AccessDifficulty } from '@/data/spots';
 import { CatchLog } from '@/data/catches';
 import { SPECIES_DATA } from '@/data/species';
 import { computeSpotPressure } from '@/data/heatmap';
@@ -8,6 +8,7 @@ import {
   MapPin, Calendar, ChevronDown, ChevronUp,
   CheckCircle2, Fish, Footprints, Car, MountainSnow,
   Thermometer, Waves, Anchor, Edit3, Save, Plus, X, ShieldAlert,
+  Trash2, AlertTriangle, Check
 } from 'lucide-react';
 
 interface SpotDetailProps {
@@ -15,6 +16,8 @@ interface SpotDetailProps {
   catches: CatchLog[];
   onLogCatch: () => void;
   onUpdateSpecies?: (spotId: string, updatedSpecies: string[]) => void;
+  onUpdateSpotDetails?: (spotId: string, updates: Partial<FishingSpot>) => void;
+  onDeleteSpot?: (spotId: string) => void;
 }
 
 const ACCESS_LABELS: Record<string, { label: string; icon: React.ReactNode; color: string }> = {
@@ -48,20 +51,62 @@ function formatHour(h: number): string {
   return `${display}${ampm}`;
 }
 
-export const SpotDetail: React.FC<SpotDetailProps> = ({ spot, catches, onLogCatch, onUpdateSpecies }) => {
+export const SpotDetail: React.FC<SpotDetailProps> = ({
+  spot,
+  catches,
+  onLogCatch,
+  onUpdateSpecies,
+  onUpdateSpotDetails,
+  onDeleteSpot,
+}) => {
   const [expandedSpecies, setExpandedSpecies] = useState<string | null>(null);
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [weatherLoading, setWeatherLoading] = useState<boolean>(true);
+
+  // Edit Spot Details state
+  const [isEditingDetails, setIsEditingDetails] = useState(false);
+  const [editName, setEditName] = useState(spot.name);
+  const [editNotes, setEditNotes] = useState(spot.notes || '');
+  const [editAccess, setEditAccess] = useState<AccessDifficulty>(spot.accessDifficulty || 'easy');
+  const [editSpeciesList, setEditSpeciesList] = useState<string[]>(spot.species);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   // Localhost Admin Species Editing state
   const [isEditingSpecies, setIsEditingSpecies] = useState(false);
   const [editedSpeciesList, setEditedSpeciesList] = useState<string[]>(spot.species);
   const [customSpeciesInput, setCustomSpeciesInput] = useState('');
 
-  // Keep edited species list updated if spot changes
+  // Keep edited state updated if spot changes
   useEffect(() => {
+    setEditName(spot.name);
+    setEditNotes(spot.notes || '');
+    setEditAccess(spot.accessDifficulty || 'easy');
+    setEditSpeciesList(spot.species);
     setEditedSpeciesList(spot.species);
+    setIsEditingDetails(false);
+    setShowDeleteModal(false);
   }, [spot]);
+
+  const handleToggleEditSpecies = (speciesName: string) => {
+    setEditSpeciesList((prev) =>
+      prev.includes(speciesName) ? prev.filter((s) => s !== speciesName) : [...prev, speciesName]
+    );
+  };
+
+  const handleSaveSpotDetails = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editName.trim()) return;
+
+    if (onUpdateSpotDetails) {
+      onUpdateSpotDetails(spot.id, {
+        name: editName.trim(),
+        notes: editNotes.trim(),
+        accessDifficulty: editAccess,
+        species: editSpeciesList,
+      });
+    }
+    setIsEditingDetails(false);
+  };
 
   const handleToggleSpeciesItem = (name: string) => {
     setEditedSpeciesList((prev) =>
@@ -115,6 +160,170 @@ export const SpotDetail: React.FC<SpotDetailProps> = ({ spot, catches, onLogCatc
 
   return (
     <div className="p-6 pt-14 flex flex-col h-full animate-in fade-in duration-300">
+      {/* Header action bar */}
+      <div className="flex items-center justify-between gap-2 mb-3">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setIsEditingDetails(!isEditingDetails)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-extrabold bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 transition-all cursor-pointer shadow-sm active:scale-95"
+            title="Edit spot name, notes, access, or species"
+          >
+            <Edit3 className="w-3.5 h-3.5" />
+            <span>{isEditingDetails ? 'Cancel Edit' : 'Edit Spot'}</span>
+          </button>
+          <button
+            onClick={() => setShowDeleteModal(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-extrabold bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 transition-all cursor-pointer shadow-sm active:scale-95"
+            title="Delete this fishing spot"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+            <span>Delete Spot</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Delete Confirmation Card */}
+      {showDeleteModal && (
+        <div className="mb-5 bg-rose-950/60 border border-rose-500/60 rounded-xl p-4 animate-in fade-in duration-200 shadow-xl">
+          <div className="flex items-center gap-2 text-rose-400 font-bold text-sm mb-2">
+            <AlertTriangle className="w-4 h-4 shrink-0" />
+            Delete Fishing Spot?
+          </div>
+          <p className="text-xs text-rose-200/90 mb-4 leading-relaxed">
+            Are you sure you want to delete <strong className="text-white">{spot.name}</strong>? This will permanently remove it from the map and cloud database.
+          </p>
+          <div className="flex items-center justify-end gap-2">
+            <button
+              onClick={() => setShowDeleteModal(false)}
+              className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-secondary hover:bg-secondary/80 text-foreground transition-all cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => {
+                if (onDeleteSpot) onDeleteSpot(spot.id);
+                setShowDeleteModal(false);
+              }}
+              className="px-3.5 py-1.5 rounded-lg text-xs font-extrabold bg-rose-600 hover:bg-rose-500 text-white shadow-md transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              Confirm Delete
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Inline Edit Spot Details Form */}
+      {isEditingDetails ? (
+        <form onSubmit={handleSaveSpotDetails} className="mb-6 bg-card border border-cyan-500/40 rounded-xl p-4 shadow-xl space-y-4 animate-in fade-in duration-200">
+          <div className="flex items-center justify-between border-b border-border/60 pb-2">
+            <h3 className="text-sm font-extrabold uppercase tracking-wider text-cyan-400 flex items-center gap-1.5">
+              <Edit3 className="w-4 h-4" />
+              Edit Spot Details
+            </h3>
+            <button
+              type="button"
+              onClick={() => setIsEditingDetails(false)}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">
+              Spot / Water Body Name
+            </label>
+            <input
+              type="text"
+              value={editName}
+              onChange={(e) => setEditName(e.target.value)}
+              required
+              className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-cyan-400 font-semibold"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">
+              Access Difficulty
+            </label>
+            <div className="grid grid-cols-3 gap-2">
+              {(['easy', 'moderate', 'hike'] as AccessDifficulty[]).map((accKey) => (
+                <button
+                  key={accKey}
+                  type="button"
+                  onClick={() => setEditAccess(accKey)}
+                  className={`flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg text-xs font-bold border transition-all ${
+                    editAccess === accKey
+                      ? 'border-cyan-400 bg-cyan-500/20 text-cyan-300 shadow-md'
+                      : 'border-border bg-secondary/30 text-muted-foreground hover:bg-secondary/60'
+                  }`}
+                >
+                  {ACCESS_LABELS[accKey]?.icon}
+                  <span className="capitalize">{accKey}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">
+              Field Notes / Access Tips
+            </label>
+            <textarea
+              value={editNotes}
+              onChange={(e) => setEditNotes(e.target.value)}
+              rows={3}
+              placeholder="Add notes about structure, boat ramps, parking, baits..."
+              className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-cyan-400"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
+              Fish Species Present ({editSpeciesList.length})
+            </label>
+            <div className="max-h-36 overflow-y-auto space-y-1.5 pr-1 border border-border rounded-lg p-2 bg-background/50">
+              {SPECIES_DATA.map((sp) => {
+                const isSelected = editSpeciesList.includes(sp.name);
+                return (
+                  <button
+                    key={sp.name}
+                    type="button"
+                    onClick={() => handleToggleEditSpecies(sp.name)}
+                    className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-md text-xs transition-all ${
+                      isSelected
+                        ? 'bg-cyan-500/20 text-cyan-300 font-bold border border-cyan-500/40'
+                        : 'bg-secondary/20 text-muted-foreground hover:bg-secondary/40'
+                    }`}
+                  >
+                    <span>{sp.name}</span>
+                    {isSelected && <Check className="w-3.5 h-3.5 text-cyan-400" />}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="flex items-center justify-end gap-2 pt-2 border-t border-border/60">
+            <button
+              type="button"
+              onClick={() => setIsEditingDetails(false)}
+              className="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-secondary hover:bg-secondary/80 text-foreground transition-all cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-1.5 rounded-lg text-xs font-extrabold bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 shadow-md transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+            >
+              <Save className="w-3.5 h-3.5 fill-slate-950" />
+              Save Spot Changes
+            </button>
+          </div>
+        </form>
+      ) : null}
+
       {/* Name + coordinates */}
       <div className="mb-5">
         <h2 className="text-2xl font-bold text-foreground leading-tight mb-3">

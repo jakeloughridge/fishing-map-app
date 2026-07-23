@@ -847,3 +847,113 @@ export const saveAllSpots = async (spots: FishingSpot[]): Promise<void> => {
     console.warn('Failed to push spots to cloud store:', err);
   }
 };
+
+export const updateSpotDetails = async (
+  spotId: string,
+  updates: Partial<Pick<FishingSpot, 'name' | 'notes' | 'accessDifficulty' | 'species'>>
+): Promise<FishingSpot[]> => {
+  const current = getSpots();
+  const updated = current.map((s) => {
+    if (s.id === spotId) {
+      return { ...s, ...updates };
+    }
+    return s;
+  });
+
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+
+  if (syncChannel) {
+    syncChannel.postMessage('sync');
+  }
+
+  // Push update to cloud store
+  try {
+    const res = await fetch(CLOUD_SYNC_URL);
+    let cloudSpots: FishingSpot[] = [];
+    if (res.ok) {
+      const data = await res.json();
+      cloudSpots = (Array.isArray(data?.spots) ? data.spots : Array.isArray(data?.data?.spots) ? data.data.spots : []) as FishingSpot[];
+    }
+
+    const mergedMap = new Map<string, FishingSpot>();
+    if (Array.isArray(cloudSpots)) {
+      cloudSpots.forEach((s) => {
+        if (s.id) mergedMap.set(s.id, s);
+      });
+    }
+
+    const target = updated.find((s) => s.id === spotId);
+    if (target) {
+      mergedMap.set(spotId, { ...target, isUserAdded: true });
+    }
+
+    const mergedUserSpots = Array.from(mergedMap.values());
+
+    await fetch(CLOUD_SYNC_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        name: 'fishing_map_spots',
+        spots: mergedUserSpots,
+      }),
+    });
+  } catch (err) {
+    console.warn('Failed to push updated spot details to cloud store:', err);
+  }
+
+  return updated;
+};
+
+export const deleteSpot = async (spotId: string): Promise<FishingSpot[]> => {
+  // Remove from all local storage keys
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && (key.startsWith('fishing_spots') || key.startsWith('fish_mapper'))) {
+        const val = localStorage.getItem(key);
+        if (val) {
+          try {
+            const parsed = JSON.parse(val);
+            if (Array.isArray(parsed)) {
+              const filtered = parsed.filter((s: FishingSpot) => s.id !== spotId);
+              localStorage.setItem(key, JSON.stringify(filtered));
+            }
+          } catch {
+            // Ignore unparseable
+          }
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('Error deleting spot from local storage:', err);
+  }
+
+  if (syncChannel) {
+    syncChannel.postMessage('sync');
+  }
+
+  // Remove from cloud store
+  try {
+    const res = await fetch(CLOUD_SYNC_URL);
+    let cloudSpots: FishingSpot[] = [];
+    if (res.ok) {
+      const data = await res.json();
+      cloudSpots = (Array.isArray(data?.spots) ? data.spots : Array.isArray(data?.data?.spots) ? data.data.spots : []) as FishingSpot[];
+    }
+
+    const filteredCloud = cloudSpots.filter((s) => s.id !== spotId);
+
+    await fetch(CLOUD_SYNC_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        name: 'fishing_map_spots',
+        spots: filteredCloud,
+      }),
+    });
+  } catch (err) {
+    console.warn('Failed to delete spot from cloud store:', err);
+  }
+
+  return getSpots();
+};
