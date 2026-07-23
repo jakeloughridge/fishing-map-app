@@ -481,5 +481,27 @@ export const SPECIES_DATA: FishSpecies[] = [
       { name: "Live Cut Bait & Steel Leader", setup: "5/0 circle hook, 50lb steel wire leader, 2oz heavy slip float, 4\" fresh cut shad or mullet", tip: "Set float 2–4ft deep near backwater logjams; give gar 10 seconds to turn bait before setting hook" },
       { name: "Topwater Walking Plug", setup: "Rapala Skitter Walk or Heddon Zara Spook in bone/silver, 30lb fluorocarbon", tip: "Twitch slow along calm river coves at dusk — explosive topwater strikes" }
     ]
+  },
+  {
+    name: "Arctic Grayling",
+    color: "#38bdf8", // Celestial Sky Blue
+    description: "Coldwater Arctic game fish with a magnificent iridescent sail-like dorsal fin. Eager surface feeder in clean tundra streams and cold glacial rivers.",
+    season: "June through September peak",
+    habitat: "Cold Arctic freestone rivers, clear tundra streams, high-latitude lakes",
+    bestRigs: [
+      { name: "Dry Fly Pattern", setup: "Size 14 Royal Wulff or Elk Hair Caddis, 9ft 5X leader", tip: "Cast into foam lines and current seams — Grayling rise eagerly to dry flies" },
+      { name: "Small Inline Spinner", setup: "1/16oz Mepps Aglia or Panther Martin in black/gold", tip: "Slow retrieve through deep tailout pools" }
+    ]
+  },
+  {
+    name: "Pacific Halibut",
+    color: "#0284c7", // Deep Ocean Blue
+    description: "Giant bottom-dwelling saltwater flatfish predator of Alaska bays and Gulf waters. Known to exceed 200+ lbs ('barn doors').",
+    season: "May through September peak",
+    habitat: "Saltwater bays, deep gravel banks, underwater trenches 60–300ft",
+    bestRigs: [
+      { name: "Heavy Spreader Bar & Circle Hook", setup: "16/0 circle hook, 2lb lead weight, whole herring or octopus", tip: "Lower directly to the ocean floor in 100–200ft; keep bait stationary on bottom" },
+      { name: "Large Rubber Swimbait", setup: "8–12oz leadhead, 8\" white or glow paddletail, 80lb braided line", tip: "Bounce off bottom with rhythmic jigging motions" }
+    ]
   }
 ];

@@ -14,7 +14,7 @@ export type FishingSpot = {
 };
 
 // Changing this key forces all browsers to start fresh (old key is simply abandoned)
-const STORAGE_KEY = 'fishing_spots_v33';
+const STORAGE_KEY = 'fishing_spots_v35';
 
 // Spots spread across the continental US & Canada
 const DEFAULT_SPOTS: FishingSpot[] = [
@@ -515,6 +515,50 @@ const DEFAULT_SPOTS: FishingSpot[] = [
     lng: -151.07,
     species: ['King Salmon', 'Sockeye Salmon', 'Coho Salmon', 'Pink Salmon', 'Chum Salmon', 'Lake Trout', 'Mountain Whitefish', 'Rainbow Trout', 'Cutthroat Trout'],
     notes: 'World-famous turquoise glacial river on Alaska\'s Kenai Peninsula. Legendary runs of King Salmon, Sockeye, Coho, Pink, and Chum salmon, plus trophy Lake Trout (Mackinaw), Mountain Whitefish, and monster Rainbow Trout (30"+) feeding on salmon eggs and flesh.',
+    dateAdded: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    isUserAdded: false,
+    accessDifficulty: 'easy',
+  },
+  {
+    id: 'spot-ak-2',
+    name: 'Russian River Confluence — Cooper Landing, AK',
+    lat: 60.4870,
+    lng: -149.9860,
+    species: ['Sockeye Salmon', 'Coho Salmon', 'Rainbow Trout', 'King Salmon', 'Arctic Grayling'],
+    notes: 'Famous clearwater salmon stream merging into the Kenai River. Epic summer runs of Sockeye (Red) Salmon, trophy 30"+ leopard rainbow trout, and Arctic Grayling feeding in gravel shallows.',
+    dateAdded: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    isUserAdded: false,
+    accessDifficulty: 'easy',
+  },
+  {
+    id: 'spot-ak-3',
+    name: 'Kvichak River — Bristol Bay, AK',
+    lat: 59.3330,
+    lng: -156.8830,
+    species: ['Rainbow Trout', 'Sockeye Salmon', 'King Salmon', 'Arctic Grayling', 'Lake Trout'],
+    notes: 'The crown jewel of Bristol Bay. Home to the largest sockeye salmon run on Earth and world-famous wild rainbow trout (30"+ girthy "football" trout) that gorge on salmon eggs in fall.',
+    dateAdded: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    isUserAdded: false,
+    accessDifficulty: 'hike',
+  },
+  {
+    id: 'spot-ak-4',
+    name: 'Ship Creek — Downtown Anchorage, AK',
+    lat: 61.2255,
+    lng: -149.8885,
+    species: ['King Salmon', 'Coho Salmon', 'Pink Salmon'],
+    notes: 'The world\'s only urban tidal King Salmon fishery right in downtown Anchorage. Anglers hook 40+ lb Chinooks and Coho salmon against the city skyline during peak summer tides.',
+    dateAdded: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    isUserAdded: false,
+    accessDifficulty: 'easy',
+  },
+  {
+    id: 'spot-ak-5',
+    name: 'Kachemak Bay — Homer Spit, AK',
+    lat: 59.6025,
+    lng: -151.4150,
+    species: ['Pacific Halibut', 'King Salmon', 'Coho Salmon', 'Rockfish'],
+    notes: 'Homer is known as the "Halibut Capital of the World". Kachemak Bay features world-class saltwater charters for giant Pacific Halibut ("barn doors" over 150 lbs), feeder King Salmon, and Black Rockfish.',
     dateAdded: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
     isUserAdded: false,
     accessDifficulty: 'easy',
