@@ -160,27 +160,29 @@ export const SpotDetail: React.FC<SpotDetailProps> = ({
 
   return (
     <div className="p-6 pt-14 flex flex-col h-full animate-in fade-in duration-300">
-      {/* Header action bar */}
-      <div className="flex items-center justify-between gap-2 mb-3">
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setIsEditingDetails(!isEditingDetails)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-extrabold bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 transition-all cursor-pointer shadow-sm active:scale-95"
-            title="Edit spot name, notes, access, or species"
-          >
-            <Edit3 className="w-3.5 h-3.5" />
-            <span>{isEditingDetails ? 'Cancel Edit' : 'Edit Spot'}</span>
-          </button>
-          <button
-            onClick={() => setShowDeleteModal(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-extrabold bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 transition-all cursor-pointer shadow-sm active:scale-95"
-            title="Delete this fishing spot"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-            <span>Delete Spot</span>
-          </button>
+      {/* Header action bar (Localhost Admin Only) */}
+      {isLocalhost && (
+        <div className="flex items-center justify-between gap-2 mb-3">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setIsEditingDetails(!isEditingDetails)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-extrabold bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 transition-all cursor-pointer shadow-sm active:scale-95"
+              title="Edit spot name, notes, access, or species (Localhost Admin)"
+            >
+              <Edit3 className="w-3.5 h-3.5" />
+              <span>{isEditingDetails ? 'Cancel Edit' : 'Edit Spot (Admin)'}</span>
+            </button>
+            <button
+              onClick={() => setShowDeleteModal(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-extrabold bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 transition-all cursor-pointer shadow-sm active:scale-95"
+              title="Delete this fishing spot (Localhost Admin)"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              <span>Delete Spot (Admin)</span>
+            </button>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Delete Confirmation Card */}
       {showDeleteModal && (
