@@ -12,7 +12,7 @@ import { LogCatchForm } from '@/components/LogCatchForm';
 import { CommunityForum } from '@/components/CommunityForum';
 import { HeatmapLegend } from '@/components/HeatmapLegend';
 
-import { getSpots, saveSpot, updateSpotSpecies, FishingSpot } from '@/data/spots';
+import { getSpots, saveSpot, updateSpotSpecies, fetchCommunitySpots, FishingSpot } from '@/data/spots';
 import { getCatches, logCatch, CatchLog } from '@/data/catches';
 import { computePressurePoints } from '@/data/heatmap';
 
@@ -38,20 +38,16 @@ function FishingMapApp() {
     setCatches(getCatches());
 
     // Sync community spots from global cloud store
-    import('@/data/spots').then(({ fetchCommunitySpots }) => {
+    fetchCommunitySpots().then((synced) => {
+      setSpots(synced);
+    });
+
+    // Poll for new community spots every 10 seconds
+    const syncInterval = setInterval(() => {
       fetchCommunitySpots().then((synced) => {
         setSpots(synced);
       });
-    });
-
-    // Poll for new community spots every 15 seconds
-    const syncInterval = setInterval(() => {
-      import('@/data/spots').then(({ fetchCommunitySpots }) => {
-        fetchCommunitySpots().then((synced) => {
-          setSpots(synced);
-        });
-      });
-    }, 15000);
+    }, 10000);
 
     return () => clearInterval(syncInterval);
   }, []);
@@ -80,10 +76,10 @@ function FishingMapApp() {
     setSidebarMode('spot');
   };
 
-  const handleSaveSpot = (newSpot: FishingSpot) => {
-    saveSpot(newSpot);
-    const updated = getSpots();
-    setSpots(updated);
+  const handleSaveSpot = async (newSpot: FishingSpot) => {
+    await saveSpot(newSpot);
+    const synced = await fetchCommunitySpots();
+    setSpots(synced);
     setSidebarMode(null);
     setPendingLatLng(null);
   };
@@ -108,12 +104,9 @@ function FishingMapApp() {
     setPendingLatLng(null);
   };
 
-  const handleSyncSpots = () => {
-    import('@/data/spots').then(({ fetchCommunitySpots }) => {
-      fetchCommunitySpots().then((synced) => {
-        setSpots(synced);
-      });
-    });
+  const handleSyncSpots = async () => {
+    const synced = await fetchCommunitySpots();
+    setSpots(synced);
   };
 
   return (

@@ -613,7 +613,7 @@ const DEFAULT_SPOTS: FishingSpot[] = [
   },
 ];
 
-const CLOUD_SYNC_URL = 'https://api.restful-api.dev/objects/ff8081819f7e10ae019f8743c8530ec4';
+const CLOUD_SYNC_URL = 'https://jsonblob.com/api/jsonBlob/019f9057-6468-7451-bb50-8dfdcffc760a';
 
 const syncChannel = typeof window !== 'undefined' && 'BroadcastChannel' in window
   ? new BroadcastChannel('fishing_map_sync')
@@ -678,7 +678,7 @@ export const fetchCommunitySpots = async (): Promise<FishingSpot[]> => {
     if (!res.ok) return getSpots();
 
     const data = await res.json();
-    const cloudSpots = (data?.data?.spots ?? []) as FishingSpot[];
+    const cloudSpots = (Array.isArray(data?.spots) ? data.spots : Array.isArray(data?.data?.spots) ? data.data.spots : []) as FishingSpot[];
 
     if (!Array.isArray(cloudSpots) || cloudSpots.length === 0) {
       return getSpots();
@@ -725,7 +725,7 @@ export const saveSpot = async (spot: FishingSpot): Promise<void> => {
     let cloudSpots: FishingSpot[] = [];
     if (res.ok) {
       const data = await res.json();
-      cloudSpots = (data?.data?.spots ?? []) as FishingSpot[];
+      cloudSpots = (Array.isArray(data?.spots) ? data.spots : Array.isArray(data?.data?.spots) ? data.data.spots : []) as FishingSpot[];
     }
 
     const mergedMap = new Map<string, FishingSpot>();
@@ -742,10 +742,10 @@ export const saveSpot = async (spot: FishingSpot): Promise<void> => {
 
     await fetch(CLOUD_SYNC_URL, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify({
         name: 'fishing_map_spots',
-        data: { spots: mergedUserSpots },
+        spots: mergedUserSpots,
       }),
     });
   } catch (err) {
@@ -762,7 +762,7 @@ export const saveAllSpots = async (spots: FishingSpot[]): Promise<void> => {
     let cloudSpots: FishingSpot[] = [];
     if (res.ok) {
       const data = await res.json();
-      cloudSpots = (data?.data?.spots ?? []) as FishingSpot[];
+      cloudSpots = (Array.isArray(data?.spots) ? data.spots : Array.isArray(data?.data?.spots) ? data.data.spots : []) as FishingSpot[];
     }
 
     const mergedMap = new Map<string, FishingSpot>();
@@ -779,10 +779,10 @@ export const saveAllSpots = async (spots: FishingSpot[]): Promise<void> => {
 
     await fetch(CLOUD_SYNC_URL, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify({
         name: 'fishing_map_spots',
-        data: { spots: mergedUserSpots },
+        spots: mergedUserSpots,
       }),
     });
   } catch (err) {
