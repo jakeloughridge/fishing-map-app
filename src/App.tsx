@@ -108,6 +108,14 @@ function FishingMapApp() {
     setPendingLatLng(null);
   };
 
+  const handleSyncSpots = () => {
+    import('@/data/spots').then(({ fetchCommunitySpots }) => {
+      fetchCommunitySpots().then((synced) => {
+        setSpots(synced);
+      });
+    });
+  };
+
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-background text-foreground font-sans">
       <style>{`
@@ -123,6 +131,7 @@ function FishingMapApp() {
         setShowHeatmap={setShowHeatmap}
         onPinAtCenter={() => handlePinDrop(39.5, -96.0)}
         onOpenForum={() => setSidebarMode('forum')}
+        onSyncSpots={handleSyncSpots}
       />
 
       <MapView

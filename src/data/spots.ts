@@ -707,8 +707,8 @@ export const fetchCommunitySpots = async (): Promise<FishingSpot[]> => {
   }
 };
 
-// Push newly pinned water spot to global cloud store
-export const saveSpot = (spot: FishingSpot): void => {
+// Push newly pinned water spot to global cloud store with atomic cloud merging
+export const saveSpot = async (spot: FishingSpot): Promise<void> => {
   const current = getSpots();
   const exists = current.some((s) => s.id === spot.id);
   const updated = exists ? current.map((s) => (s.id === spot.id ? spot : s)) : [...current, spot];
@@ -719,27 +719,73 @@ export const saveSpot = (spot: FishingSpot): void => {
     syncChannel.postMessage({ type: 'SPOT_ADDED', spot });
   }
 
-  // Push user-added spots to cloud store asynchronously
-  const userSpots = updated.filter((s) => s.isUserAdded);
-  fetch(CLOUD_SYNC_URL, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      name: 'fishing_map_spots',
-      data: { spots: userSpots },
-    }),
-  }).catch((err) => console.warn('Failed to push spot to cloud store:', err));
+  // Fetch current cloud spots first, then merge to prevent overwriting spots added by other users
+  try {
+    const res = await fetch(CLOUD_SYNC_URL);
+    let cloudSpots: FishingSpot[] = [];
+    if (res.ok) {
+      const data = await res.json();
+      cloudSpots = (data?.data?.spots ?? []) as FishingSpot[];
+    }
+
+    const mergedMap = new Map<string, FishingSpot>();
+    if (Array.isArray(cloudSpots)) {
+      cloudSpots.forEach((s) => {
+        if (s.id) mergedMap.set(s.id, s);
+      });
+    }
+
+    // Add or update the new spot
+    mergedMap.set(spot.id, { ...spot, isUserAdded: true });
+
+    const mergedUserSpots = Array.from(mergedMap.values());
+
+    await fetch(CLOUD_SYNC_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: 'fishing_map_spots',
+        data: { spots: mergedUserSpots },
+      }),
+    });
+  } catch (err) {
+    console.warn('Failed to push merged spot to cloud store:', err);
+  }
 };
 
-export const saveAllSpots = (spots: FishingSpot[]): void => {
+export const saveAllSpots = async (spots: FishingSpot[]): Promise<void> => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(spots));
   const userSpots = spots.filter((s) => s.isUserAdded);
-  fetch(CLOUD_SYNC_URL, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      name: 'fishing_map_spots',
-      data: { spots: userSpots },
-    }),
-  }).catch((err) => console.warn('Failed to push spots to cloud store:', err));
+
+  try {
+    const res = await fetch(CLOUD_SYNC_URL);
+    let cloudSpots: FishingSpot[] = [];
+    if (res.ok) {
+      const data = await res.json();
+      cloudSpots = (data?.data?.spots ?? []) as FishingSpot[];
+    }
+
+    const mergedMap = new Map<string, FishingSpot>();
+    if (Array.isArray(cloudSpots)) {
+      cloudSpots.forEach((s) => {
+        if (s.id) mergedMap.set(s.id, s);
+      });
+    }
+    userSpots.forEach((s) => {
+      if (s.id) mergedMap.set(s.id, s);
+    });
+
+    const mergedUserSpots = Array.from(mergedMap.values());
+
+    await fetch(CLOUD_SYNC_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: 'fishing_map_spots',
+        data: { spots: mergedUserSpots },
+      }),
+    });
+  } catch (err) {
+    console.warn('Failed to push spots to cloud store:', err);
+  }
 };

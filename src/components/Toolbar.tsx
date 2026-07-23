@@ -1,5 +1,5 @@
 import React from 'react';
-import { Layers, MapPin, Droplet, MessageSquareText } from 'lucide-react';
+import { Layers, MapPin, Droplet, MessageSquareText, RefreshCw } from 'lucide-react';
 
 interface ToolbarProps {
   showMarkers: boolean;
@@ -8,6 +8,7 @@ interface ToolbarProps {
   setShowHeatmap: (v: boolean) => void;
   onPinAtCenter?: () => void;
   onOpenForum?: () => void;
+  onSyncSpots?: () => void;
 }
 
 export const Toolbar: React.FC<ToolbarProps> = ({
@@ -17,6 +18,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   setShowHeatmap,
   onPinAtCenter,
   onOpenForum,
+  onSyncSpots,
 }) => {
   return (
     <div className="absolute top-6 left-1/2 -translate-x-1/2 z-[1000] flex flex-col items-center gap-2">
@@ -52,6 +54,17 @@ export const Toolbar: React.FC<ToolbarProps> = ({
             <Layers className="w-4 h-4" />
             Heatmap
           </button>
+
+          {onSyncSpots && (
+            <button
+              onClick={onSyncSpots}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-bold bg-secondary hover:bg-secondary/80 text-foreground border border-border transition-all shadow-sm"
+              title="Pull latest community spots from cloud"
+            >
+              <RefreshCw className="w-3.5 h-3.5 text-cyan-400" />
+              <span>Sync Spots</span>
+            </button>
+          )}
 
           {onOpenForum && (
             <button
