@@ -503,5 +503,48 @@ export const SPECIES_DATA: FishSpecies[] = [
       { name: "Heavy Spreader Bar & Circle Hook", setup: "16/0 circle hook, 2lb lead weight, whole herring or octopus", tip: "Lower directly to the ocean floor in 100–200ft; keep bait stationary on bottom" },
       { name: "Large Rubber Swimbait", setup: "8–12oz leadhead, 8\" white or glow paddletail, 80lb braided line", tip: "Bounce off bottom with rhythmic jigging motions" }
     ]
+  },
+  {
+    name: "Snook",
+    color: "#10b981", // Emerald Snook Yellowfin
+    description: "Iconic Florida ambush predator with distinct black lateral line and yellow fins. Patrols mangrove shorelines, dock light pilings, and inlet spillways.",
+    season: "Spring through Autumn (Best night dock fishing & summer inlet spawn)",
+    habitat: "Mangrove roots, dock light pilings, bridge shadow lines, inlet jetties",
+    bestRigs: [
+      { name: "Live Flare-Leg / Pigfish Rig", setup: "3/0 circle hook, 40lb fluorocarbon leader, live pinfish or pilchard", tip: "Free-line live bait into shadow lines under dock lights at night" },
+      { name: "White Paddletail & Jighead", setup: "1/4oz NLBN or Z-Man 4\" white paddletail, 30lb leader", tip: "Slow roll along dark dock shadow lines; twitch when passing pilings" },
+      { name: "FLIR / Topwater Walker", setup: "Heddon Super Spook Jr in bone/silver, 30lb fluorocarbon", tip: "Work along mangrove edges at high tide dawn" }
+    ]
+  },
+  {
+    name: "Tarpon",
+    color: "#e2e8f0", // Silver King Slate
+    description: "The 'Silver King' — legendary giant saltwater gamefish famous for explosive topwater bites and acrobatic 10-foot leaps.",
+    season: "April through August peak (Spring/Summer migration)",
+    habitat: "Inlets, coastal passes, lagoon channels, beach fronts, bridge spans",
+    bestRigs: [
+      { name: "Live Crab Float Rig", setup: "6/0 circle hook, 60lb fluorocarbon leader, live pass crab under float", tip: "Drift live crab through inlet outgoing tide seams; bow when the fish leaps!" },
+      { name: "Swimbait / Soft Jerkbait", setup: "6\" Hogy or D.O.A. Swimming Mullet in pearl white, 50lb leader", tip: "Cast ahead of rolling schools in lagoon channels" }
+    ]
+  },
+  {
+    name: "Mangrove Snapper",
+    color: "#f97316", // Coral Orange
+    description: "Clever, sharp-eyed structure dweller of Florida estuaries. Fights aggressively around mangrove roots, bridge pylons, and rock jetties.",
+    season: "Year-round, best Summer spawn",
+    habitat: "Mangrove prop roots, bridge footings, rock jetties, deep docks",
+    bestRigs: [
+      { name: "Knocker Rig", setup: "#1 circle hook, 1/4oz knocker sinker resting on hook, 20lb fluorocarbon, live shrimp or cut threadfin", tip: "Drop tight to mangrove roots or dock pilings — strike immediately on touch" }
+    ]
+  },
+  {
+    name: "Jack Crevalle",
+    color: "#f59e0b", // Amber Gold
+    description: "Ferocious, high-speed schooling predator. Known as the pound-for-pound hardest pulling fish in coastal estuaries.",
+    season: "Spring through Autumn peak",
+    habitat: "Seawalls, lagoon channels, bait busts, open flats",
+    bestRigs: [
+      { name: "Topwater Popper", setup: "Yo-Zuri 3D Popper, 30lb leader", tip: "Rip popper fast across surface near feeding frenzies" }
+    ]
   }
 ];

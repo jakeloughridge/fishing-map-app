@@ -14,7 +14,7 @@ export type FishingSpot = {
 };
 
 // Changing this key forces all browsers to start fresh (old key is simply abandoned)
-const STORAGE_KEY = 'fishing_spots_v35';
+const STORAGE_KEY = 'fishing_spots_v36';
 
 // Spots spread across the continental US & Canada
 const DEFAULT_SPOTS: FishingSpot[] = [
@@ -559,6 +559,30 @@ const DEFAULT_SPOTS: FishingSpot[] = [
     lng: -151.4150,
     species: ['Pacific Halibut', 'King Salmon', 'Coho Salmon', 'Rockfish'],
     notes: 'Homer is known as the "Halibut Capital of the World". Kachemak Bay features world-class saltwater charters for giant Pacific Halibut ("barn doors" over 150 lbs), feeder King Salmon, and Black Rockfish.',
+    dateAdded: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    isUserAdded: false,
+    accessDifficulty: 'easy',
+  },
+
+  // ── Florida Estuaries & Indian River Lagoon ─────────────────────────────
+  {
+    id: 'spot-fl-1',
+    name: 'Indian River Lagoon — Jupiter Inlet Estuary, FL',
+    lat: 26.9440,
+    lng: -80.0820,
+    species: ['Snook', 'Tarpon', 'Red Drum', 'Spotted Seatrout', 'Mangrove Snapper', 'Jack Crevalle', 'Florida Gar'],
+    notes: 'World-famous coastal estuary where the Indian River Lagoon and Loxahatchee River meet Jupiter Inlet. Renowned for giant trophy Snook under night dock lights, rolling Silver King Tarpon, Redfish on shallow grass flats, aggressive Mangrove Snapper around bridge pilings, and hard-fighting Jack Crevalle.',
+    dateAdded: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    isUserAdded: false,
+    accessDifficulty: 'easy',
+  },
+  {
+    id: 'spot-fl-2',
+    name: 'Loxahatchee River — Sandprit Park / Jupiter Sound, FL',
+    lat: 26.9600,
+    lng: -80.0950,
+    species: ['Snook', 'Tarpon', 'Red Drum', 'Spotted Seatrout', 'Jack Crevalle', 'Florida Gar', 'Gar'],
+    notes: 'Wild and scenic river estuary feeding into the southern Indian River Lagoon. Excellent boat, kayak, and shore access for slot and over-slot Snook, juvenile Tarpon, Florida Gar in brackish reaches, and speckled trout along mangrove drop-offs.',
     dateAdded: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
     isUserAdded: false,
     accessDifficulty: 'easy',
